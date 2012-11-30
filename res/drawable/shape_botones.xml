@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android" >
+   <item android:state_pressed="true" >        
+        <shape android:shape="rectangle">
+            <solid android:color="@color/background_title" />
+            <padding 
+                   android:left="10dp"
+                	android:top="10dp"
+                	android:right="10dp"
+                	android:bottom="10dp" />
+            <stroke   
+                android:width="1dp"
+                android:color="@color/azul_fuerte" />                        
+        </shape>    
+    </item>
+    <item>
+        <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+           <item>
+                <shape android:shape="rectangle">
+                    <solid android:color="@color/rojo_fuerte" />
+                    <gradient
+                        android:startColor="@color/rojo_fuerte"
+                        android:endColor="@color/rojo_claro"
+                        android:angle="270" />
+                </shape>
+            </item>
+            <item android:top="0dp" android:bottom="-1dp" android:left="-1dp" android:right="-1dp">
+                <shape android:shape="rectangle">
+                    <stroke   
+                        android:width="1dp"
+                        android:color="@color/background_main" /> 
+                    <solid android:color="#00000000" />                       
+                </shape>
+            </item>
+            <item android:top="-1dp" android:bottom="0dp" android:left="-1dp" android:right="-1dp">
+                <shape android:shape="rectangle">
+                    <stroke   
+                        android:width="1dp"
+                        android:color="@color/background_title" />
+                     <solid android:color="#00000000" />                        
+                </shape>
+            </item>         
+        </layer-list>
+    </item>
+</selector>
+
+
