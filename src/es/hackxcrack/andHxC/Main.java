@@ -62,7 +62,7 @@ public class Main extends Activity{
 	 * 		@return boolean true cuando la app tiene conexion false cuando no dispone de conexion
 	 */
 	
-	private boolean isInternetEnabled(Context cxt){
+	private boolean getInternetState(Context cxt){
 		 ConnectivityManager conexion = null;
 		 NetworkInfo[] infoConexion = null;
 		 
@@ -70,20 +70,17 @@ public class Main extends Activity{
 		                			.getSystemService(Context.CONNECTIVITY_SERVICE);
 		 if ( conexion == null )
 		       return false;
-		 else {
-		      infoConexion = conexion.getAllNetworkInfo();
+		 
+		 infoConexion = conexion.getAllNetworkInfo();
 		      
-		      if ( infoConexion == null ) 
-		    	 return false;
-		      else {
+		 if ( infoConexion == null ) 
+		   	 return false;
 		    	  
-		    	  for(int i = 0; i < infoConexion.length; i++) {
-		              if ( infoConexion[i].getState() == NetworkInfo.State.CONNECTED )
-		                  return true;   
-		          }
-		    	  
-		      }
+		 for(int i = 0; i < infoConexion.length; i++) {
+		     if ( infoConexion[i].getState() == NetworkInfo.State.CONNECTED )
+		    	 return true;   
 		 }
+		    	  
 		 return false;
 	}
 	
@@ -181,7 +178,9 @@ public class Main extends Activity{
 
 						@Override
 						public void onFocusChange(View v, boolean hasFocus) {
-							EditText tmpEditext = (EditText) v.findViewById(R.id.login_editext_user);
+							EditText tmpEditext = null;
+							tmpEditext = (EditText) v.findViewById(R.id.login_editext_user);
+							
 							if ( hasFocus ){
 								if ( tmpEditext.getText().toString().equals("::Escribe tu usuario") )
 									tmpEditext.setText("");
@@ -196,7 +195,9 @@ public class Main extends Activity{
 
 						@Override
 						public void onFocusChange(View v, boolean hasFocus) {
-							EditText tmpEditext = (EditText) v.findViewById(R.id.login_editext_password);
+							EditText tmpEditext = null;
+							tmpEditext = (EditText) v.findViewById(R.id.login_editext_password);
+							
 							if ( hasFocus ){
 								if ( tmpEditext.getText().toString().equals("::Escribe tu password") )
 									tmpEditext.setText("");
@@ -217,9 +218,8 @@ public class Main extends Activity{
 							
 							loginUser = new UserManager();
 							if ( tmp_User.length() != 0 && tmp_Password.length() != 0 ){
-								//((ProgressBar) me.findViewById(R.id.progress_login)).setVisibility(View.VISIBLE);
-								loginUser.execute("zomweed", "BUSHId0247-,.");
-								v.getRootView().setVisibility(View.GONE);
+								loginUser.execute(tmp_User, tmp_Password);
+								popupLogin.dismiss();
 							}
 							
 							tmp_User = null;
@@ -228,10 +228,11 @@ public class Main extends Activity{
 					  
 				   });
 				   
-				   // Mostramos el layout
-				   popupLogin.showAtLocation(layout, Gravity.NO_GRAVITY, puntoPopups.x, puntoPopups.y );
-			   }else
-				   popupLogin.getContentView().setVisibility(View.VISIBLE);
+				  
+			   }
+			   
+			   // Mostramos el layout
+			   popupLogin.showAtLocation(layout, Gravity.NO_GRAVITY, puntoPopups.x, puntoPopups.y );
 			   
 		   }
 		 	 		   
@@ -254,7 +255,7 @@ public class Main extends Activity{
 				
 			public void onClick( View v ){
 				/* No lo he probado en el movil, en el emulador siempre da CONECTADO */
-				if ( isInternetEnabled(me.getApplicationContext()) ){
+				if ( getInternetState(me.getApplicationContext()) ){
 					touchCallback();
 				}else
 					showPopupInfo(me,"Hey! No tengo internet. Revisa tu conexión.");
@@ -265,7 +266,7 @@ public class Main extends Activity{
 		((Button) this.findViewById(R.id.btn_login)).setOnClickListener(new OnClickListener(){
 		
 			public void onClick ( View v ) {
-				if ( isInternetEnabled(me.getApplicationContext()) )
+				if ( getInternetState(me.getApplicationContext()) )
 					showPopupLogin(me);
 				else
 					showPopupInfo(me,"Hey! No tengo internet. Revisa tu conexión.");
@@ -317,7 +318,7 @@ public class Main extends Activity{
 	        progressBar.setProgress(10);
 	        
 	        if (this.cookie == null) {
-	            return -1;
+	            return correctUserLogin;
 	        }
 
 	        // Se hace la petición al sistema de login
