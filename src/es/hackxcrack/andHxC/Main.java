@@ -51,9 +51,9 @@ public class Main extends Activity{
      *
      */	
 	public void touchCallback(){
-		/*Intent i = new Intent();
-        i.setClass(this, SubMain.class);
-        startActivity(i);*/
+            Intent i = new Intent();
+            i.setClass(this, SubMain.class);
+            startActivity(i);
 	}
 		
 	/**
