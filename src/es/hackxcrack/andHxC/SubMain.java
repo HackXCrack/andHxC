@@ -137,7 +137,7 @@ public class SubMain extends Activity{
         this.subForumNameIdMap = new HashMap<String, String>();
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
+        setContentView(R.layout.submain);
 
         // Declara el callback
         ListView listView = (ListView) findViewById(R.id.subforum_list);
