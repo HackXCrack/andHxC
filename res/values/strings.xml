@@ -8,4 +8,5 @@
     <string name="btn_login">Iniciar Sesión</string>
     <string name="btn_anonimo">Entrar como Anonimo</string>
     <string name="info_internet">Hey! No tengo internet, revisa tu conexión.</string>
+    <string name="loading">Cargando...</string>
 </resources>

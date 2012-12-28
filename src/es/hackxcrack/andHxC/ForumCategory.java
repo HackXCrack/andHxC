@@ -93,7 +93,7 @@ public class ForumCategory extends Activity{
             this.postIdList.add(id);
         }
 
-        return true;
+        return posts.size() != 0;
     }
 
     /** LLamado cuando la actividad se crea por primera vez. */
@@ -107,13 +107,17 @@ public class ForumCategory extends Activity{
 
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.forum_category);
+        setContentView(R.layout.loading_view); // Salta a la vista de carga temporalmente
+
 
         if (!populateFromPage(id, 0)){
+            // @TODO cambiar por una vista de error
             finish();
         }
 
-        // Declara el callback
+
+        setContentView(R.layout.forum_category);
+
         ListView listView = (ListView) findViewById(R.id.post_list);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
