@@ -2,16 +2,10 @@
 <resources>
     <string name="app_name">andHxC</string>
     <string name="forum_name">Hack X Crack</string>
-    <string name="logoHxC">Logo HackxCrack</string><string name="subtitle_main">Comunidad de seguridad informática</string><string name="title_popup">Información del sistema</string><string name="btn_login">Iniciar Sesión</string>
+    <string name="logoHxC">Logo HackxCrack</string>
+    <string name="subtitle_main">Comunidad de seguridad informática</string>
+    <string name="title_popup">Información del sistema</string>
+    <string name="btn_login">Iniciar Sesión</string>
     <string name="btn_anonimo">Entrar como Anonimo</string>
-    
-    
-    
-    <color name="background_main">#eaeaea</color>
-    <color name="background_title">#647b8d</color>
-    <color name="rojo_fuerte">#830202</color>
-    <color name="rojo_claro">#ac3f3f</color>
-    <color name="azul_fuerte">#0f3c53</color>
-    
     <string name="info_internet">Hey! No tengo internet, revisa tu conexión.</string>
 </resources>
