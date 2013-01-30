@@ -1,24 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout  xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="fill_parent"
-              android:layout_height="wrap_content"
-              android:orientation="vertical">
+              android:layout_height="fill_parent">
+
 
   <ImageView
       android:id="@+id/iv_logo"
-      android:layout_width="302dp"
+      android:layout_width="fill_parent"
       android:layout_height="wrap_content"
-      android:layout_marginLeft="5dp"
+      android:layout_marginTop="10dp"
       android:contentDescription="@string/logoHxC"
-      android:src="@drawable/logo" />
+      android:src="@drawable/logo"
+      android:layout_centerInParent="true" />
 
-    <TextView android:id="@+id/textv_loading"
+
+    <TextView android:id="@+id/loading_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="-15dp"
-        android:layout_marginBottom="15dp"
-        android:textColor="@color/background_title"
-        android:textSize="12sp"
-        android:text="@string/loading"/>
+        android:layout_below="@id/iv_logo"
+        android:textSize="14sp"
+        android:text="@string/loading"
+        android:layout_centerInParent="true" />
 
-</LinearLayout>
+</RelativeLayout>
