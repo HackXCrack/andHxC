@@ -1,6 +1,7 @@
 package es.hackxcrack.andHxC;
 
 import android.app.Activity;
+import android.os.AsyncTask;
 import android.os.Bundle;
 
 import android.content.Context;
@@ -93,7 +94,7 @@ public class ForumCategory extends Activity{
             this.postIdList.add(id);
         }
 
-        return true;
+        return posts.size() != 0;
     }
 
     /** LLamado cuando la actividad se crea por primera vez. */
@@ -107,21 +108,37 @@ public class ForumCategory extends Activity{
 
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.forum_category);
 
-        if (!populateFromPage(id, 0)){
-            finish();
-        }
+        // Salta a la vista de carga temporalmente
+        setContentView(R.layout.loading_view);
 
-        // Declara el callback
-        ListView listView = (ListView) findViewById(R.id.post_list);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    touchCallback(position);
+        // Carga en segundo plano los posts mientras muestra la pantalla de error
+        new AsyncTask<Integer, Void, Boolean>() {
+            @Override
+            protected Boolean doInBackground(Integer... id) {
+                return populateFromPage(id[0], 0);
+            }
+
+            @Override
+            protected void onPostExecute(Boolean populated) {
+                // Si falló al tomar la lista de elementos
+                if (!populated){
+                    finish();
                 }
-            });
 
-        showPosts();
+                // Mostrar la lista
+                setContentView(R.layout.forum_category);
+
+                ListView listView = (ListView) findViewById(R.id.post_list);
+                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                            touchCallback(position);
+                        }
+                    });
+
+                showPosts();
+            }
+        }.execute(id);
     }
 
 }
