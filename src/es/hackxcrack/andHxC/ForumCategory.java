@@ -21,6 +21,8 @@ import android.view.View;
 
 import android.util.Log;
 
+import org.apache.commons.lang.StringEscapeUtils;
+
 public class ForumCategory extends Activity{
 
     private List<String> postNameList;
@@ -87,7 +89,7 @@ public class ForumCategory extends Activity{
 
 
         for (Pair<String, String> post : posts){
-            String name = post.left;
+            String name = StringEscapeUtils.unescapeHtml(post.left);
             String id = post.right;
 
             this.postNameList.add(name);
