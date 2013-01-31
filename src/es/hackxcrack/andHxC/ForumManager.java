@@ -27,7 +27,7 @@ public class ForumManager {
     private final static Pattern FORUM_REGEX = Pattern.compile("<a class=\"subject\" href=\"(http://(www\\.)?hackxcrack.es/forum/index.php[?]board=\\d+).0\" name=\"b(\\d+)\">([^<]+)</a>");
 
     /**
-     * Esto busca en una página de una categoría y saca el nombre e ID de los post.
+     * Esto busca en una página de una categoría y saca el nombre, ID y autor de los post.
      *
      * @TODO cambiarlo por un parser SGML, esto no es bueno para la cordura de nadie.
      */
