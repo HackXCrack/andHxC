@@ -9,7 +9,7 @@ public class MainTesting {
     public static void main(String[] args){
 
 
-        /*// -------------------------------------------------------
+        // -------------------------------------------------------
         System.out.println("Leyendo lista de foros");
         System.out.println(ForumManager.getForumList());
 
@@ -17,6 +17,7 @@ public class MainTesting {
 
 
         // -------------------------------------------------------
+        /*
         System.out.println("Pruebas con login...");
         if (args.length != 2) {
             System.out.println("args: <user> <passwd>");

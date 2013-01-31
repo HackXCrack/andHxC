@@ -7,9 +7,13 @@ import android.os.Bundle;
 import android.content.Context;
 import android.content.Intent;
 
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.LayoutInflater;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ArrayAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.List;
@@ -25,8 +29,57 @@ import org.apache.commons.lang.StringEscapeUtils;
 
 public class ForumCategory extends Activity{
 
-    private List<String> postNameList;
-    private List<String> postIdList;
+
+    /**
+     * Description: Maneja las filas de la lista de posts.
+     *
+     */
+    private class PostListAdapter extends ArrayAdapter<PostInfo> {
+        private List<PostInfo> items;
+
+        public PostListAdapter(Context context, int textViewResourceId, List<PostInfo> items) {
+            super(context, textViewResourceId, items);
+            this.items = items;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            View v = convertView;
+            if (v == null) {
+                LayoutInflater layout = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                v = layout.inflate(R.layout.category_row_layout, null);
+            }
+            PostInfo post = items.get(position);
+            if (post != null) {
+                TextView tvPostName = (TextView) v.findViewById(R.id.post_name);
+                TextView tvResponseNum = (TextView) v.findViewById(R.id.response_num);
+                if (tvPostName != null) {
+                    tvPostName.setText(post.getName());
+                }
+                if(tvResponseNum != null){
+
+                    int responseNum = post.getResponseNumber();
+                    switch(responseNum){
+                    case 0:
+                        tvResponseNum.setText(getString(R.string.no_responses));
+                        break;
+
+                    case 1:
+                        tvResponseNum.setText(getString(R.string.one_response));
+                        break;
+
+                    default:
+                        tvResponseNum.setText(responseNum + " " + getString(R.string.responses));
+                    }
+                }
+            }
+            return v;
+        }
+    }
+
+
+
+    private List<PostInfo> postList;
 
 
     /**
@@ -36,8 +89,7 @@ public class ForumCategory extends Activity{
      * @param position Posición del item seleccionado.
      */
     public void touchCallback(int position){
-        String name = this.postNameList.get(position);
-        String id = this.postIdList.get(position);
+        PostInfo name = this.postList.get(position);
 
         /*
         Intent i = new Intent();
@@ -56,10 +108,9 @@ public class ForumCategory extends Activity{
     public void showPosts(){
         ListView listView = (ListView) findViewById(R.id.post_list);
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-                                                                R.layout.category_row_layout,
-                                                                R.id.post_name,
-                                                                this.postNameList);
+        PostListAdapter adapter = new PostListAdapter(
+            this, R.layout.category_row_layout, this.postList);
+
         listView.setAdapter(adapter);
     }
 
@@ -73,8 +124,8 @@ public class ForumCategory extends Activity{
      * @return boolean True si la operación se ha realizado correctamente.
      */
     private boolean populateFromPage(int categoryId, int page){
-        List<Pair<String, String>> posts = ForumManager.getPostsFromCategory(categoryId, page);
-        if (posts == null){
+        postList = ForumManager.getPostsFromCategory(categoryId, page);
+        if (postList == null){
             Context context = getApplicationContext();
             CharSequence text = "Error requesting posts";
             int duration = Toast.LENGTH_SHORT;
@@ -84,19 +135,7 @@ public class ForumCategory extends Activity{
             return false;
         }
 
-        this.postNameList = new ArrayList<String>();
-        this.postIdList = new ArrayList<String>();
-
-
-        for (Pair<String, String> post : posts){
-            String name = StringEscapeUtils.unescapeHtml(post.left);
-            String id = post.right;
-
-            this.postNameList.add(name);
-            this.postIdList.add(id);
-        }
-
-        return posts.size() != 0;
+        return postList.size() != 0;
     }
 
     /** LLamado cuando la actividad se crea por primera vez. */

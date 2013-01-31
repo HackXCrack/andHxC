@@ -15,9 +15,6 @@ import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 
-import android.util.Log;
-
-
 public class ForumManager {
 
     private final static String MAIN_FORUM = "http://www.hackxcrack.es/forum/?";
@@ -32,8 +29,27 @@ public class ForumManager {
     /**
      * Esto busca en una página de una categoría y saca el nombre e ID de los post.
      *
+     * @TODO cambiarlo por un parser SGML, esto no es bueno para la cordura de nadie.
      */
-    private final static Pattern POST_REGEX = Pattern.compile("<span class=\"subject_title\" id=\"msg_\\d+\"><a href=\"http://www.hackxcrack.es/forum/index.php\\?topic=(\\d+).0\">([^<]*)</a></span>");
+    /*                                        <td class="stats windowbg">
+                                                3 Respuestas
+                                                <br />
+                                                247 Vistas
+                                  </td>
+    */
+    private final static Pattern POST_REGEX = Pattern.compile(
+        "\\s*<td class=\"subject windowbg2\">" +
+          "\\s*<div\\s*>" +
+            "\\s*<span class=\"subject_title\" id=\"msg_\\d+\">" +
+              "<a href=\"http://www.hackxcrack.es/forum/index.php\\?topic=(\\d+).0\">([^<]*)</a>" +
+            "</span>" +
+            "\\s*<p>[^<]*<a[^>]*>[^<]*</a>\\s*<small id=\"[^\"]*\">" +
+             "(?:[^<]*<a[^>]*>\\d*</a>[^<]*)*" +
+            "</small>\\s*</p>" +
+          "\\s*</div>" +
+        "\\s*</td>" +
+        "\\s*<td class=\"stats windowbg\">" +
+          "\\s*(\\d*) Respuestas?");
 
     /**
      * Descripción: Lee los datos en una url. Usa una cookie si se especifica.
@@ -74,7 +90,7 @@ public class ForumManager {
      *
      * @note No implementado, por ahora se usará la lista estática.
      */
-    public static List<Pair<String, String>> getForumList(){
+    public static List<PostInfo> getForumList(){
 
         try {
             System.out.println(fetchUrl(MAIN_FORUM, null));
@@ -86,27 +102,28 @@ public class ForumManager {
     /**
      * Descripción: Devuelve la lista de posts de una categoría como una tupla de (nombre, id).
      *
-     * @return  List<Pair<String, String>>
+     * @return  List<PostInfo>
      */
-    public static List<Pair<String, String>> getPostsFromCategory(int categoryId, int page){
+    public static List<PostInfo> getPostsFromCategory(int categoryId, int page){
         String url = MAIN_FORUM + "board=" + categoryId + "." + page * 10;
 
-        List <Pair<String, String>> postList = new ArrayList<Pair<String, String>>();
+        List <PostInfo> postList = new ArrayList<PostInfo>();
         String data;
         try {
             data = fetchUrl(url, null);
         } catch (IOException ioException) {
-            Log.e("andHxC getPostsFromCategory", ioException + "");
+            //Log.e("andHxC getPostsFromCategory", ioException + "");
             return null;
         }
 
         Matcher match = POST_REGEX.matcher(data);
 
         while (match.find()){
-            String name = match.group(2);
             String id = match.group(1);
+            String name = match.group(2);
+            int responseNum = Integer.parseInt(match.group(3));
 
-            postList.add(new Pair<String, String>(name, id));
+            postList.add(new PostInfo(name, responseNum, id));
         }
 
         return postList;

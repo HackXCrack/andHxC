@@ -9,4 +9,10 @@
     <string name="btn_anonimo">Entrar como Anonimo</string>
     <string name="info_internet">Hey! No tengo internet, revisa tu conexión.</string>
     <string name="loading">Cargando...</string>
+    <string name="no_posts">sin posts</string>
+    <string name="one_post">1 post</string>
+    <string name="posts">posts</string>
+    <string name="no_responses">sin respuestas</string>
+    <string name="one_response">1 respuesta</string>
+    <string name="responses">respuestas</string>
 </resources>
