@@ -54,7 +54,7 @@ public class ForumCategory extends Activity{
                 TextView tvPostName = (TextView) v.findViewById(R.id.post_name);
                 TextView tvResponseNum = (TextView) v.findViewById(R.id.response_num);
                 if (tvPostName != null) {
-                    tvPostName.setText(post.getName());
+                    tvPostName.setText(StringEscapeUtils.unescapeHtml(post.getName()));
                 }
                 if(tvResponseNum != null){
 
