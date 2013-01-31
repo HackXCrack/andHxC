@@ -12,6 +12,7 @@
     <TextView android:id="@+id/post_num"
               android:layout_width="fill_parent"
               android:layout_height="wrap_content"
-              android:textSize="16dip" />
+              android:textSize="14dip"
+              android:gravity="right" />
 
 </LinearLayout>
