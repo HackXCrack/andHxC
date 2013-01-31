@@ -31,24 +31,18 @@ public class ForumManager {
      *
      * @TODO cambiarlo por un parser SGML, esto no es bueno para la cordura de nadie.
      */
-    /*                                        <td class="stats windowbg">
-                                                3 Respuestas
-                                                <br />
-                                                247 Vistas
-                                  </td>
-    */
     private final static Pattern POST_REGEX = Pattern.compile(
-        "\\s*<td class=\"subject windowbg2\">" +
+        "\\s*<td class=\"subject[^\"]*\">" +
           "\\s*<div\\s*>" +
-            "\\s*<span class=\"subject_title\" id=\"msg_\\d+\">" +
+            "\\s*(?:<strong>\\s*)?<span class=\"subject_title\" id=\"msg_\\d+\">" +
               "<a href=\"http://www.hackxcrack.es/forum/index.php\\?topic=(\\d+).0\">([^<]*)</a>" +
-            "</span>" +
+            "</span>(?:\\s*</strong>)?" +
             "\\s*<p>[^<]*<a[^>]*>([^<]*)</a>\\s*<small id=\"[^\"]*\">" +
              "(?:[^<]*<a[^>]*>\\d*</a>[^<]*)*" +
             "</small>\\s*</p>" +
           "\\s*</div>" +
         "\\s*</td>" +
-        "\\s*<td class=\"stats windowbg\">" +
+        "\\s*<td class=\"stats[^\"]*\">" +
           "\\s*(\\d*) Respuestas?");
 
     /**
