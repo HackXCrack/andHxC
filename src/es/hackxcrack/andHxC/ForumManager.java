@@ -43,7 +43,7 @@ public class ForumManager {
             "\\s*<span class=\"subject_title\" id=\"msg_\\d+\">" +
               "<a href=\"http://www.hackxcrack.es/forum/index.php\\?topic=(\\d+).0\">([^<]*)</a>" +
             "</span>" +
-            "\\s*<p>[^<]*<a[^>]*>[^<]*</a>\\s*<small id=\"[^\"]*\">" +
+            "\\s*<p>[^<]*<a[^>]*>([^<]*)</a>\\s*<small id=\"[^\"]*\">" +
              "(?:[^<]*<a[^>]*>\\d*</a>[^<]*)*" +
             "</small>\\s*</p>" +
           "\\s*</div>" +
@@ -121,9 +121,10 @@ public class ForumManager {
         while (match.find()){
             String id = match.group(1);
             String name = match.group(2);
-            int responseNum = Integer.parseInt(match.group(3));
+            String author = match.group(3);
+            int responseNum = Integer.parseInt(match.group(4));
 
-            postList.add(new PostInfo(name, responseNum, id));
+            postList.add(new PostInfo(name, responseNum, id, author));
         }
 
         return postList;

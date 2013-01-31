@@ -52,9 +52,13 @@ public class ForumCategory extends Activity{
             PostInfo post = items.get(position);
             if (post != null) {
                 TextView tvPostName = (TextView) v.findViewById(R.id.post_name);
+                TextView tvAuthor = (TextView) v.findViewById(R.id.post_author);
                 TextView tvResponseNum = (TextView) v.findViewById(R.id.response_num);
                 if (tvPostName != null) {
                     tvPostName.setText(StringEscapeUtils.unescapeHtml(post.getName()));
+                }
+                if (tvAuthor != null){
+                    tvAuthor.setText(getString(R.string.posted_by) + " " + post.getAuthor());
                 }
                 if(tvResponseNum != null){
 
