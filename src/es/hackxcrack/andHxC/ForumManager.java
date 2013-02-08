@@ -14,6 +14,9 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 
+import org.htmlcleaner.*;
+
+import android.util.Log;
 
 public class ForumManager {
 
@@ -47,13 +50,12 @@ public class ForumManager {
 
 
     /**
-     * Esto busca en una página de una categoría y saca los subforos.
+     * Descripción: Busca las ID del tablón en una URL.
      *
-     * @TODO cambiarlo por un parser SGML, esto no es bueno para la cordura de nadie.
      */
-    private final static Pattern SUBFORUM_REGEX = Pattern.compile(
-        "<a class=\"subject\" href=\"http://www.hackxcrack.es/forum/index.php\\?board=(\\d+).0\"[^>]*>([^<]*)</a>"
-        );
+    private final static Pattern BOARD_ID_MATCHER = Pattern.compile(
+        "(?:\\?|&)board=(\\d+)(\\.\\d+)");
+
 
     /**
      * Descripción: Lee los datos en una url. Usa una cookie si se especifica.
@@ -120,17 +122,27 @@ public class ForumManager {
             return null;
         }
 
+        HtmlCleaner cleaner = new HtmlCleaner();
+        TagNode doc = cleaner.clean(data);
 
-        Matcher match = SUBFORUM_REGEX.matcher(data);
-        while (match.find()){
-            int id = Integer.parseInt(match.group(1));
-            String name = match.group(2);
+        List<TagNode> subjects = doc.getElementListByAttValue("class", "subject",
+                                                              true, true);
+        for (TagNode subject: subjects){
+            Matcher idMatch = BOARD_ID_MATCHER.matcher(subject.getAttributeByName("href"));
+            if (idMatch.find()){
 
-            postList.add(new PostInfo(name, null, id, null, true));
+                int id = Integer.parseInt(idMatch.group(1));
+                String name = subject.getText().toString();
+
+                postList.add(new PostInfo(name, null, id, null, true));
+            }
+            else{
+                Log.e("andHxC", "Board ID not found on url “" + subject.getAttributeByName("href") + "”");
+            }
         }
 
 
-        match = POST_REGEX.matcher(data);
+        Matcher match = POST_REGEX.matcher(data);
 
         while (match.find()){
             int id = Integer.parseInt(match.group(1));
