@@ -45,6 +45,16 @@ public class ForumManager {
         "\\s*<td class=\"stats[^\"]*\">" +
           "\\s*(\\d*) Respuestas?");
 
+
+    /**
+     * Esto busca en una página de una categoría y saca los subforos.
+     *
+     * @TODO cambiarlo por un parser SGML, esto no es bueno para la cordura de nadie.
+     */
+    private final static Pattern SUBFORUM_REGEX = Pattern.compile(
+        "<a class=\"subject\" href=\"http://www.hackxcrack.es/forum/index.php\\?board=(\\d+).0\"[^>]*>([^<]*)</a>"
+        );
+
     /**
      * Descripción: Lee los datos en una url. Usa una cookie si se especifica.
      *
@@ -98,7 +108,7 @@ public class ForumManager {
      *
      * @return  List<PostInfo>
      */
-    public static List<PostInfo> getPostsFromCategory(int categoryId, int page){
+    public static List<PostInfo> getItemsFromCategory(int categoryId, int page){
         String url = MAIN_FORUM + "board=" + categoryId + "." + page * 10;
 
         List <PostInfo> postList = new ArrayList<PostInfo>();
@@ -110,15 +120,25 @@ public class ForumManager {
             return null;
         }
 
-        Matcher match = POST_REGEX.matcher(data);
+
+        Matcher match = SUBFORUM_REGEX.matcher(data);
+        while (match.find()){
+            int id = Integer.parseInt(match.group(1));
+            String name = match.group(2);
+
+            postList.add(new PostInfo(name, null, id, null, true));
+        }
+
+
+        match = POST_REGEX.matcher(data);
 
         while (match.find()){
-            String id = match.group(1);
+            int id = Integer.parseInt(match.group(1));
             String name = match.group(2);
             String author = match.group(3);
             int responseNum = Integer.parseInt(match.group(4));
 
-            postList.add(new PostInfo(name, responseNum, id, author));
+            postList.add(new PostInfo(name, responseNum, id, author, false));
         }
 
         return postList;

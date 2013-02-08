@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.content.Context;
 import android.content.Intent;
 
+import android.graphics.Typeface;
+
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.LayoutInflater;
@@ -29,6 +31,7 @@ import org.apache.commons.lang.StringEscapeUtils;
 
 public class ForumCategory extends Activity{
 
+    private static Context context;
 
     /**
      * Description: Maneja las filas de la lista de posts.
@@ -49,20 +52,27 @@ public class ForumCategory extends Activity{
                 LayoutInflater layout = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 v = layout.inflate(R.layout.category_row_layout, null);
             }
-            PostInfo post = items.get(position);
+            final PostInfo post = items.get(position);
             if (post != null) {
                 TextView tvPostName = (TextView) v.findViewById(R.id.post_name);
                 TextView tvAuthor = (TextView) v.findViewById(R.id.post_author);
                 TextView tvResponseNum = (TextView) v.findViewById(R.id.response_num);
                 if (tvPostName != null) {
                     tvPostName.setText(StringEscapeUtils.unescapeHtml(post.getName()));
-                }
-                if (tvAuthor != null){
-                    tvAuthor.setText(getString(R.string.posted_by) + " " + post.getAuthor());
-                }
-                if(tvResponseNum != null){
 
-                    int responseNum = post.getResponseNumber();
+                    if (post.isSubforum()){
+                        tvPostName.setTypeface(null, Typeface.BOLD);
+                    }
+                }
+
+                String author = post.getAuthor();
+                if ((tvAuthor != null) && (author != null)){
+                    tvAuthor.setText(getString(R.string.posted_by) + " " + author);
+                }
+
+                Integer responseNum = post.getResponseNumber();
+                if((tvResponseNum != null) && (responseNum != null)){
+
                     switch(responseNum){
                     case 0:
                         tvResponseNum.setText(getString(R.string.no_responses));
@@ -75,6 +85,19 @@ public class ForumCategory extends Activity{
                     default:
                         tvResponseNum.setText(responseNum + " " + getString(R.string.responses));
                     }
+                }
+
+                // Set action on click
+                if (post.isSubforum()){
+                    v.setOnClickListener(new View.OnClickListener() {
+                        public void onClick(View view) {
+                            Intent i = new Intent();
+                            i.setClass(ForumCategory.context, ForumCategory.class);
+                            i.putExtra("id", post.getId());
+                            i.putExtra("name", post.getName());
+                            startActivity(i);
+                        }
+                    });
                 }
             }
             return v;
@@ -128,7 +151,7 @@ public class ForumCategory extends Activity{
      * @return boolean True si la operación se ha realizado correctamente.
      */
     private boolean populateFromPage(int categoryId, int page){
-        postList = ForumManager.getPostsFromCategory(categoryId, page);
+        postList = ForumManager.getItemsFromCategory(categoryId, page);
         if (postList == null){
             Context context = getApplicationContext();
             CharSequence text = "Error requesting posts";
@@ -153,6 +176,7 @@ public class ForumCategory extends Activity{
 
 
         super.onCreate(savedInstanceState);
+        ForumCategory.context = getApplicationContext();
 
         // Salta a la vista de carga temporalmente
         setContentView(R.layout.loading_view);
