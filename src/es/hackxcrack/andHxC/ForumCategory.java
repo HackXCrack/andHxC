@@ -52,6 +52,7 @@ public class ForumCategory extends Activity{
                 LayoutInflater layout = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 v = layout.inflate(R.layout.category_row_layout, null);
             }
+
             final PostInfo post = items.get(position);
             if (post != null) {
                 TextView tvPostName = (TextView) v.findViewById(R.id.post_name);
@@ -63,27 +64,39 @@ public class ForumCategory extends Activity{
                     if (post.isSubforum()){
                         tvPostName.setTypeface(null, Typeface.BOLD);
                     }
+                    else{
+                        tvPostName.setTypeface(null, Typeface.NORMAL);
+                    }
                 }
 
                 String author = post.getAuthor();
-                if ((tvAuthor != null) && (author != null)){
-                    tvAuthor.setText(getString(R.string.posted_by) + " " + author);
+                if (tvAuthor != null){
+                    if (author != null){
+                        tvAuthor.setText(getString(R.string.posted_by) + " " + author);
+                    }
+                    else{
+                        tvAuthor.setText("");
+                    }
                 }
 
                 Integer responseNum = post.getResponseNumber();
-                if((tvResponseNum != null) && (responseNum != null)){
+                if(tvResponseNum != null){
+                    if (responseNum != null){
+                        switch(responseNum){
+                        case 0:
+                            tvResponseNum.setText(getString(R.string.no_responses));
+                            break;
 
-                    switch(responseNum){
-                    case 0:
-                        tvResponseNum.setText(getString(R.string.no_responses));
-                        break;
+                        case 1:
+                            tvResponseNum.setText(getString(R.string.one_response));
+                            break;
 
-                    case 1:
-                        tvResponseNum.setText(getString(R.string.one_response));
-                        break;
-
-                    default:
-                        tvResponseNum.setText(responseNum + " " + getString(R.string.responses));
+                        default:
+                            tvResponseNum.setText(responseNum + " " + getString(R.string.responses));
+                        }
+                    }
+                    else{
+                        tvResponseNum.setText("");
                     }
                 }
 
