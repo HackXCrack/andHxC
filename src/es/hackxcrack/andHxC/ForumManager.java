@@ -125,20 +125,25 @@ public class ForumManager {
         HtmlCleaner cleaner = new HtmlCleaner();
         TagNode doc = cleaner.clean(data);
 
-        List<TagNode> subjects = doc.getElementListByAttValue("class", "subject",
-                                                              true, true);
-        for (TagNode subject: subjects){
-            Matcher idMatch = BOARD_ID_MATCHER.matcher(subject.getAttributeByName("href"));
-            if (idMatch.find()){
+        try{
+            Object[] subjects = doc.evaluateXPath("//a[@class=\"subject\"]");
+            for (int i = 0;i < subjects.length; i++){
+                TagNode subject = (TagNode) subjects[i];
+                Matcher idMatch = BOARD_ID_MATCHER.matcher(subject.getAttributeByName("href"));
+                if (idMatch.find()){
 
-                int id = Integer.parseInt(idMatch.group(1));
-                String name = subject.getText().toString();
+                    int id = Integer.parseInt(idMatch.group(1));
+                    String name = subject.getText().toString();
 
-                postList.add(new PostInfo(name, null, id, null, true));
+                    postList.add(new PostInfo(name, null, id, null, true));
+                }
+                else{
+                    Log.e("andHxC", "Board ID not found on url “" + subject.getAttributeByName("href") + "”");
+                }
             }
-            else{
-                Log.e("andHxC", "Board ID not found on url “" + subject.getAttributeByName("href") + "”");
-            }
+        }
+        catch(XPatherException xpe){
+            Log.e("andHxC", xpe.toString());
         }
 
 
