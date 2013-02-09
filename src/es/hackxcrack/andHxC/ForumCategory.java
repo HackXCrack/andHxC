@@ -99,19 +99,6 @@ public class ForumCategory extends Activity{
                         tvResponseNum.setText("");
                     }
                 }
-
-                // Set action on click
-                if (post.isSubforum()){
-                    v.setOnClickListener(new View.OnClickListener() {
-                        public void onClick(View view) {
-                            Intent i = new Intent();
-                            i.setClass(ForumCategory.context, ForumCategory.class);
-                            i.putExtra("id", post.getId());
-                            i.putExtra("name", post.getName());
-                            startActivity(i);
-                        }
-                    });
-                }
             }
             return v;
         }
@@ -129,15 +116,17 @@ public class ForumCategory extends Activity{
      * @param position Posición del item seleccionado.
      */
     public void touchCallback(int position){
-        PostInfo name = this.postList.get(position);
+        PostInfo post = this.postList.get(position);
 
-        /*
-        Intent i = new Intent();
-        i.setClass(this, PostActivity.class);
-        i.putExtra("id", id);
-        i.putExtra("name", name);
-        startActivity(i);
-        */
+        // Jump to subforum
+        if (post.isSubforum()){
+
+            Intent i = new Intent();
+            i.setClass(ForumCategory.context, ForumCategory.class);
+            i.putExtra("id", post.getId());
+            i.putExtra("name", post.getName());
+            startActivity(i);
+        }
     }
 
 
