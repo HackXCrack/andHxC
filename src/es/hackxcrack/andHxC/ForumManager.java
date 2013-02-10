@@ -93,27 +93,12 @@ public class ForumManager {
         return null;
     }
 
+
     /**
-     * Descripción: Devuelve la lista de posts de una categoría como una tupla de (nombre, id).
+     * Descripción: Añade a la lista los subforos de una categoría.
      *
-     * @return  List<PostInfo>
      */
-    public static List<PostInfo> getItemsFromCategory(int categoryId, int page){
-        String url = MAIN_FORUM + "board=" + categoryId + "." + page * 10;
-
-        List <PostInfo> postList = new ArrayList<PostInfo>();
-        String data;
-        try {
-            data = fetchUrl(url, null);
-        } catch (IOException ioException) {
-            Log.e("andHxC getPostsFromCategory", ioException.toString());
-            return null;
-        }
-
-        HtmlCleaner cleaner = new HtmlCleaner();
-        TagNode doc = cleaner.clean(data);
-
-        // Búsqueda de subforos
+    public static void getSubforumsFromCategory(TagNode doc, List<PostInfo> subforumList){
         try{
             Object[] subforums = doc.evaluateXPath("//table[@class=\"table_list\"]/tbody/tr");
             for (int i = 0;i < subforums.length; i++){
@@ -149,12 +134,37 @@ public class ForumManager {
                 String sResponseNum = responseNode.getText().toString().trim().split("\n")[1].trim().split(" ")[0];
                 int responseNum = Integer.parseInt(sResponseNum);
 
-                postList.add(new PostInfo(name, responseNum, id, null, true));
+                subforumList.add(new PostInfo(name, responseNum, id, null, true));
             }
         }
         catch(XPatherException xpe){
             Log.e("andHxC", xpe.toString());
         }
+    }
+
+
+    /**
+     * Descripción: Devuelve la lista de posts de una categoría.
+     *
+     * @return  List<PostInfo>
+     */
+    public static List<PostInfo> getItemsFromCategory(int categoryId, int page){
+        String url = MAIN_FORUM + "board=" + categoryId + "." + page * 10;
+
+        List <PostInfo> postList = new ArrayList<PostInfo>();
+        String data;
+        try {
+            data = fetchUrl(url, null);
+        } catch (IOException ioException) {
+            Log.e("andHxC getPostsFromCategory", ioException.toString());
+            return null;
+        }
+
+        HtmlCleaner cleaner = new HtmlCleaner();
+        TagNode doc = cleaner.clean(data);
+
+        // Búsqueda de subforos
+        getSubforumsFromCategory(doc, postList);
 
 
         // Búsqueda de hilos
