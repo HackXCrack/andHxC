@@ -30,31 +30,19 @@ public class ForumManager {
     private final static Pattern FORUM_REGEX = Pattern.compile("<a class=\"subject\" href=\"(http://(www\\.)?hackxcrack.es/forum/index.php[?]board=\\d+).0\" name=\"b(\\d+)\">([^<]+)</a>");
 
     /**
-     * Esto busca en una página de una categoría y saca el nombre, ID y autor de los post.
-     *
-     * @TODO cambiarlo por un parser SGML, esto no es bueno para la cordura de nadie.
-     */
-    private final static Pattern POST_REGEX = Pattern.compile(
-        "\\s*<td class=\"subject[^\"]*\">" +
-          "\\s*<div\\s*>" +
-            "\\s*(?:<strong>\\s*)?<span class=\"subject_title\" id=\"msg_\\d+\">" +
-              "<a href=\"http://www.hackxcrack.es/forum/index.php\\?topic=(\\d+).0\">([^<]*)</a>" +
-            "</span>(?:\\s*</strong>)?" +
-            "\\s*<p>[^<]*<a[^>]*>([^<]*)</a>\\s*<small id=\"[^\"]*\">" +
-             "(?:[^<]*<a[^>]*>\\d*</a>[^<]*)*" +
-            "</small>\\s*</p>" +
-          "\\s*</div>" +
-        "\\s*</td>" +
-        "\\s*<td class=\"stats[^\"]*\">" +
-          "\\s*(\\d*) Respuestas?");
-
-
-    /**
      * Descripción: Busca las ID del tablón en una URL.
      *
      */
     private final static Pattern BOARD_ID_MATCHER = Pattern.compile(
         "(?:\\?|&)board=(\\d+)(\\.\\d+)");
+
+
+    /**
+     * Descripción: Busca las ID del tema en una URL.
+     *
+     */
+    private final static Pattern TOPIC_ID_MATCHER = Pattern.compile(
+        "(?:\\?|&)topic=(\\d+)(\\.\\d+)");
 
 
     /**
@@ -125,6 +113,7 @@ public class ForumManager {
         HtmlCleaner cleaner = new HtmlCleaner();
         TagNode doc = cleaner.clean(data);
 
+        // Búsqueda de subforos
         try{
             Object[] subjects = doc.evaluateXPath("//a[@class=\"subject\"]");
             for (int i = 0;i < subjects.length; i++){
@@ -147,15 +136,74 @@ public class ForumManager {
         }
 
 
-        Matcher match = POST_REGEX.matcher(data);
+        // Búsqueda de hilos
+        Object[] threads = null;
+        try{
+            // Localización de la información
+             threads = doc.evaluateXPath("//div[@id=\"messageindex\"]/table/tbody/tr");
+        }
+        catch(XPatherException xpe){
+            Log.e("andHxC", xpe.toString());
+        }
+        if (threads != null){
+            for (int i = 0;i < threads.length; i++){
+                TagNode thread = (TagNode) threads[i];
 
-        while (match.find()){
-            int id = Integer.parseInt(match.group(1));
-            String name = match.group(2);
-            String author = match.group(3);
-            int responseNum = Integer.parseInt(match.group(4));
+                // El evaluador de XPath no soporta not :\
+                if (thread.hasAttribute("class")){
+                    continue;
+                }
 
-            postList.add(new PostInfo(name, responseNum, id, author, false));
+                List<TagNode> titleList = thread.getElementListByAttValue("class", "subject_title", true, true);
+
+                // Extracción del título/ID
+                if((titleList.size() != 1) || (titleList.get(0).getChildTags().length != 1)){
+                    Log.e("andHxC", "Parsing error looking for title");
+                    continue;
+                }
+
+
+                TagNode title = titleList.get(0);
+                String name = title.getText().toString();
+                TagNode link = title.getChildTags()[0];
+
+                Matcher match = TOPIC_ID_MATCHER.matcher(link.getAttributeByName("href"));
+                if (!match.find()){
+                    Log.e("andHxC", "Topic ID not found on url “" + link.getAttributeByName("href") + "”");
+                    continue;
+                }
+
+                int id = Integer.parseInt(match.group(1));
+
+                // Extracción de la autoría
+                Object[] authorLink = null;
+                try {
+                    authorLink = thread.evaluateXPath("//p/a");
+                }
+                catch(XPatherException xpe){
+                    Log.e("andHxC", xpe.toString());
+                    continue;
+                }
+                if (authorLink.length != 1){
+                    Log.e("andHxC", "Parse error looking for topic author");
+                    continue;
+                }
+
+                TagNode authorTag = (TagNode) authorLink[0];
+                String author = authorTag.getText().toString();
+
+                // Extracción del número de respuestas
+                if (thread.getChildTags().length != 4){
+                    Log.e("andHxC", "Parse error looking for response number, found " +
+                          thread.getChildTags().length + " child tags, expected 4");
+                    continue;
+                }
+
+                TagNode responseNode = thread.getChildTags()[2];
+                int responseNum = Integer.parseInt(responseNode.getText().toString().trim().split(" ")[0]);
+
+                postList.add(new PostInfo(name, responseNum, id, author, false));
+            }
         }
 
         return postList;
