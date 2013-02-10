@@ -249,4 +249,12 @@ public class ForumManager {
         return postList;
    }
 
+    /**
+     * Descripción: Devuelve la lista de mensajes de un hilo.
+     *
+     * @return  List<MessageInfo>
+     */
+    public static List<MessageInfo> getItemsFromThread(int threadId, int page){
+        return new ArrayList<MessageInfo>();
+    }
 }

@@ -29,5 +29,8 @@
     <activity android:name="ForumCategory"
               android:label="@string/forum_name">
     </activity>
+    <activity android:name="ForumThread"
+              android:label="@string/forum_name">
+    </activity>
   </application>
 </manifest>
