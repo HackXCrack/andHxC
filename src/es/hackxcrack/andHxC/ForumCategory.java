@@ -84,15 +84,30 @@ public class ForumCategory extends Activity{
                     if (responseNum != null){
                         switch(responseNum){
                         case 0:
-                            tvResponseNum.setText(getString(R.string.no_responses));
+                            if (post.isSubforum()){
+                                tvResponseNum.setText(getString(R.string.no_threads));
+                            }
+                            else{
+                                tvResponseNum.setText(getString(R.string.no_responses));
+                            }
                             break;
 
                         case 1:
-                            tvResponseNum.setText(getString(R.string.one_response));
+                            if (post.isSubforum()){
+                                tvResponseNum.setText(getString(R.string.one_thread));
+                            }
+                            else{
+                                tvResponseNum.setText(getString(R.string.one_response));
+                            }
                             break;
 
                         default:
-                            tvResponseNum.setText(responseNum + " " + getString(R.string.responses));
+                            if (post.isSubforum()){
+                                tvResponseNum.setText(responseNum + " " + getString(R.string.threads));
+                            }
+                            else{
+                                tvResponseNum.setText(responseNum + " " + getString(R.string.responses));
+                            }
                         }
                     }
                     else{

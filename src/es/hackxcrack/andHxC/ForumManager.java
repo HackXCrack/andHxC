@@ -115,20 +115,41 @@ public class ForumManager {
 
         // Búsqueda de subforos
         try{
-            Object[] subjects = doc.evaluateXPath("//a[@class=\"subject\"]");
-            for (int i = 0;i < subjects.length; i++){
-                TagNode subject = (TagNode) subjects[i];
+            Object[] subforums = doc.evaluateXPath("//table[@class=\"table_list\"]/tbody/tr");
+            for (int i = 0;i < subforums.length; i++){
+                TagNode subforum = (TagNode) subforums[i];
+
+                // Búsqueda del nombre/ID
+                Object[] subjects = subforum.evaluateXPath("//a[@class=\"subject\"]");
+                if (subjects.length != 1){
+                    Log.e("andHxC", "Error parsing subforum link");
+                    continue;
+                }
+                TagNode subject = (TagNode)subjects[0];
+
                 Matcher idMatch = BOARD_ID_MATCHER.matcher(subject.getAttributeByName("href"));
-                if (idMatch.find()){
-
-                    int id = Integer.parseInt(idMatch.group(1));
-                    String name = subject.getText().toString();
-
-                    postList.add(new PostInfo(name, null, id, null, true));
-                }
-                else{
+                if (!idMatch.find()){
                     Log.e("andHxC", "Board ID not found on url “" + subject.getAttributeByName("href") + "”");
+                    continue;
                 }
+
+                int id = Integer.parseInt(idMatch.group(1));
+                String name = subject.getText().toString();
+
+                // Búsqueda del número de respuestas
+                if (subforum.getChildTags().length != 4){
+                    Log.e("andHxC", "Parse error looking for subforum response number, found " +
+                          subforum.getChildTags().length + " child tags, expected 4");
+                    continue;
+                }
+
+                TagNode responseNode = subforum.getChildTags()[2];
+
+                // Toma la fila de respuestas, haz trim() y toma de la segunda linea la primera columna
+                String sResponseNum = responseNode.getText().toString().trim().split("\n")[1].trim().split(" ")[0];
+                int responseNum = Integer.parseInt(sResponseNum);
+
+                postList.add(new PostInfo(name, responseNum, id, null, true));
             }
         }
         catch(XPatherException xpe){
