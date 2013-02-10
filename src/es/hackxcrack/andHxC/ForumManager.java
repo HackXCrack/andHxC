@@ -144,30 +144,10 @@ public class ForumManager {
 
 
     /**
-     * Descripción: Devuelve la lista de posts de una categoría.
+     * Descripción: Añade a la lista los posts de una categoría.
      *
-     * @return  List<PostInfo>
      */
-    public static List<PostInfo> getItemsFromCategory(int categoryId, int page){
-        String url = MAIN_FORUM + "board=" + categoryId + "." + page * 10;
-
-        List <PostInfo> postList = new ArrayList<PostInfo>();
-        String data;
-        try {
-            data = fetchUrl(url, null);
-        } catch (IOException ioException) {
-            Log.e("andHxC getPostsFromCategory", ioException.toString());
-            return null;
-        }
-
-        HtmlCleaner cleaner = new HtmlCleaner();
-        TagNode doc = cleaner.clean(data);
-
-        // Búsqueda de subforos
-        getSubforumsFromCategory(doc, postList);
-
-
-        // Búsqueda de hilos
+    public static void getPostsFromCategory(TagNode doc, List<PostInfo> postList){
         Object[] threads = null;
         try{
             // Localización de la información
@@ -236,6 +216,35 @@ public class ForumManager {
                 postList.add(new PostInfo(name, responseNum, id, author, false));
             }
         }
+    }
+
+
+    /**
+     * Descripción: Devuelve la lista de posts de una categoría.
+     *
+     * @return  List<PostInfo>
+     */
+    public static List<PostInfo> getItemsFromCategory(int categoryId, int page){
+        String url = MAIN_FORUM + "board=" + categoryId + "." + page * 10;
+
+        List <PostInfo> postList = new ArrayList<PostInfo>();
+        String data;
+        try {
+            data = fetchUrl(url, null);
+        } catch (IOException ioException) {
+            Log.e("andHxC getPostsFromCategory", ioException.toString());
+            return null;
+        }
+
+        HtmlCleaner cleaner = new HtmlCleaner();
+        TagNode doc = cleaner.clean(data);
+
+        // Búsqueda de subforos
+        getSubforumsFromCategory(doc, postList);
+
+
+        // Búsqueda de hilos
+        getPostsFromCategory(doc, postList);
 
         return postList;
    }
