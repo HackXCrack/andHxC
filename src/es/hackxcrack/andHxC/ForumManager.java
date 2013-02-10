@@ -106,7 +106,7 @@ public class ForumManager {
         try {
             data = fetchUrl(url, null);
         } catch (IOException ioException) {
-            //Log.e("andHxC getPostsFromCategory", ioException + "");
+            Log.e("andHxC getPostsFromCategory", ioException.toString());
             return null;
         }
 
