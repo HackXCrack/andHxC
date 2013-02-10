@@ -4,4 +4,21 @@
               android:layout_height="wrap_content"
               android:orientation="vertical">
 
+  <TextView android:id="@+id/message_text"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"  />
+
+
+  <LinearLayout android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+    <TextView android:id="@+id/message_author"
+              android:layout_width="fill_parent"
+              android:layout_height="wrap_content"
+              android:textStyle="bold"
+              android:textSize="14dip"
+              android:gravity="right" />
+
+  </LinearLayout>
 </LinearLayout>

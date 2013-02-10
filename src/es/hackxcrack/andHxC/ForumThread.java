@@ -53,6 +53,20 @@ public class ForumThread extends Activity{
             }
 
             final MessageInfo msg = messages.get(position);
+            if (msg != null){
+                TextView tvAuthor = (TextView) v.findViewById(R.id.message_author);
+                TextView tvText = (TextView) v.findViewById(R.id.message_text);
+                if (tvAuthor != null){
+                    String author = StringEscapeUtils.unescapeHtml(msg.getAuthor());
+                    if (!author.equals("")){
+                        tvAuthor.setText(getString(R.string.posted_by) + " " + author);
+                    }
+                }
+
+                if (tvText != null){
+                    tvText.setText(msg.getMessage());
+                }
+            }
             return v;
         }
     }
