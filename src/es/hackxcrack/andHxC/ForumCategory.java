@@ -142,11 +142,17 @@ public class ForumCategory extends Activity{
             i.putExtra("name", post.getName());
             startActivity(i);
         }
+        else {
+            Intent i = new Intent();
+            i.setClass(ForumCategory.context, ForumThread.class);
+            i.putExtra("id", post.getId());
+            startActivity(i);
+        }
     }
 
 
     /**
-     * Descripción: Muestra la lista de posts tomandola de this.postNameList.
+     * Descripción: Muestra la lista de posts.
      *
      */
     public void showPosts(){
@@ -157,6 +163,7 @@ public class ForumCategory extends Activity{
 
         listView.setAdapter(adapter);
     }
+
 
     /**
      * Descripción: Prepara todas las estructuras para mostrar la página `page`
@@ -226,5 +233,4 @@ public class ForumCategory extends Activity{
             }
         }.execute(id);
     }
-
 }

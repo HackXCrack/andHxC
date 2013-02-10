@@ -17,6 +17,8 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.htmlcleaner.*;
 
 import android.util.Log;
+import android.text.Html;
+import android.text.Spanned;
 
 public class ForumManager {
 
@@ -249,4 +251,88 @@ public class ForumManager {
         return postList;
    }
 
+
+    /**
+     * Descripción: Parsea el Mensaje a partir de un nodo.
+     *
+     * @return  MessageInfo
+     */
+    public static MessageInfo getMessageFromNode(HtmlCleaner cleaner, TagNode node){
+        Object[] authorNodes = null;
+        try{
+            authorNodes = node.evaluateXPath("//div[@class=\"poster\"]/h4/a");
+        }
+        catch(XPatherException xpe){
+            Log.e("andHxC", xpe.toString());
+            return null;
+        }
+
+        if (authorNodes.length != 1){
+            Log.e("andHxC", "Error retrieving author from message");
+            return null;
+        }
+
+        TagNode authorNode = (TagNode) authorNodes[0];
+        String author = authorNode.getText().toString();
+
+
+        Object[] textNodes = null;
+        try{
+            textNodes = node.evaluateXPath("//div[@class=\"post\"]/div[@class=\"inner\"]");
+        }
+        catch(XPatherException xpe){
+            Log.e("andHxC", xpe.toString());
+            return null;
+        }
+        if (textNodes.length != 1){
+            Log.e("andHxC", "Error retrieving text from message");
+        }
+
+        TagNode textNode = (TagNode) textNodes[0];
+        Log.d("andHxC", cleaner.getInnerHtml(textNode));
+        Spanned text = Html.fromHtml(cleaner.getInnerHtml(textNode));
+
+        return new MessageInfo(author, text);
+    }
+
+
+    /**
+     * Descripción: Devuelve la lista de mensajes de un hilo.
+     *
+     * @return  List<MessageInfo>
+     */
+    public static List<MessageInfo> getItemsFromThread(int threadId, int page){
+        List<MessageInfo> msgList = new ArrayList<MessageInfo>();
+        String url = MAIN_FORUM + "topic=" + threadId;
+
+        String data;
+        try {
+            data = fetchUrl(url, null);
+        } catch (IOException ioException) {
+            Log.e("andHxC getItemsFromThread", ioException.toString());
+            return null;
+        }
+
+        HtmlCleaner cleaner = new HtmlCleaner();
+        TagNode doc = cleaner.clean(data);
+
+        Object[] messages = null;
+        try{
+            messages = doc.evaluateXPath("//div[@class=\"post_wrapper\"]");
+        }
+        catch(XPatherException xpe){
+            Log.e("andHxC", xpe.toString());
+        }
+        if (messages != null){
+            for(int i = 0; i < messages.length; i++){
+                TagNode messageNode = (TagNode) messages[i];
+                MessageInfo message = getMessageFromNode(cleaner, messageNode);
+                if (message != null){
+                    msgList.add(message);
+                }
+            }
+        }
+
+        return msgList;
+    }
 }
