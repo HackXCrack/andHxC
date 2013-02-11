@@ -45,7 +45,7 @@ public class SubMain extends Activity{
 
         public String getPostNumberStr(){
             if (postNumber < 0){
-                return "- " + getString(R.string.posts);
+                return "";
             }
             else{
                 switch(postNumber){
