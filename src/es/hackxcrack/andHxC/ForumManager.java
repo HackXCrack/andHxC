@@ -20,6 +20,16 @@ import android.util.Log;
 import android.text.Html;
 import android.text.Spanned;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+
 public class ForumManager {
 
     private final static String MAIN_FORUM = "http://www.hackxcrack.es/forum/?";
@@ -36,7 +46,7 @@ public class ForumManager {
      *
      */
     private final static Pattern BOARD_ID_MATCHER = Pattern.compile(
-        "(?:\\?|&)board=(\\d+)(\\.\\d+)");
+        "(?:\\?|&)board=(\\d+)(\\.\\d+)?");
 
 
     /**
@@ -44,7 +54,7 @@ public class ForumManager {
      *
      */
     private final static Pattern TOPIC_ID_MATCHER = Pattern.compile(
-        "(?:\\?|&)topic=(\\d+)(\\.\\d+)");
+        "(?:\\?|&)topic=(\\d+)(\\.\\d+)?");
 
 
     /**
@@ -286,6 +296,7 @@ public class ForumManager {
         }
         if (textNodes.length != 1){
             Log.e("andHxC", "Error retrieving text from message");
+            return null;
         }
 
         TagNode textNode = (TagNode) textNodes[0];
@@ -338,14 +349,101 @@ public class ForumManager {
 
 
     /**
+     * Descripción: Parsea el Post a partir de un nodo.
+     *
+     * @return  PostInfo
+     */
+    public static PostInfo getPostFromNode(Element element){
+        String author = null;
+
+        // Título del post
+        NodeList titleNodes = element.getElementsByTagName("title");
+        if (titleNodes.getLength() != 1){
+            Log.e("andHxC", "Error retrieving name from post");
+            return null;
+        }
+
+        Element titleNode = (Element) titleNodes.item(0);
+        NodeList titleChilds = titleNode.getChildNodes();
+        if (titleChilds.getLength() != 1){
+            Log.e("andHxC", "Error retrieving name from post (no title childs)");
+            return null;
+        }
+
+        String title = titleChilds.item(0).getNodeValue();
+
+
+        // Id del post
+        NodeList linkNodes = element.getElementsByTagName("link");
+        if (linkNodes.getLength() != 1){
+            Log.e("andHxC", "Error retrieving id from post");
+            return null;
+        }
+
+        Element linkNode = (Element) linkNodes.item(0);
+        NodeList linkChilds = linkNode.getChildNodes();
+        if (linkChilds.getLength() != 1){
+            Log.e("andHxC", "Error retrieving id from post (no childs)");
+            return null;
+        }
+
+        Matcher match = TOPIC_ID_MATCHER.matcher(linkChilds.item(0).getNodeValue());
+
+        if (!match.find()){
+            Log.e("andHxC", "Error looking for topic id");
+            return null;
+        }
+
+        int id = Integer.parseInt(match.group(1));
+
+        return new PostInfo(title, null, id, author, false);
+    }
+
+
+    /**
      * Descripción: Devuelve la lista de novedades.
      *
      * @return  List<PostInfo>
      */
     public static List<PostInfo> getNews(){
+        String url = MAIN_FORUM + "type=rss;action=.xml;sa=news;limit=20";
         List<PostInfo> postList = new ArrayList<PostInfo>();
 
-        postList.add(new PostInfo("Example", null, 0, null, false));
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+
+        DocumentBuilder db = null;
+        try{
+            db = dbf.newDocumentBuilder();
+        }
+        catch(ParserConfigurationException pce){
+            Log.e("andHxC", pce.toString());
+            return null;
+        }
+
+        Document doc = null;
+        try{
+            doc = db.parse(url);
+        }
+        catch(SAXException saxe){
+            Log.e("andHxC", saxe.toString());
+            return null;
+        }
+        catch(IOException ioe){
+            Log.e("andHxC", ioe.toString());
+            return null;
+        }
+
+
+        NodeList nodeList = doc.getElementsByTagName("item");
+        for(int i = 0; i < nodeList.getLength(); i++){
+            Node postNode = nodeList.item(i);
+            if (postNode.getNodeType() == Node.ELEMENT_NODE){
+                PostInfo post = getPostFromNode((Element) postNode);
+                if (post != null){
+                    postList.add(post);
+                }
+            }
+        }
 
         return postList;
     }
