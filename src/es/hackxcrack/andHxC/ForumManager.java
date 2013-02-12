@@ -335,4 +335,18 @@ public class ForumManager {
 
         return msgList;
     }
+
+
+    /**
+     * Descripción: Devuelve la lista de novedades.
+     *
+     * @return  List<PostInfo>
+     */
+    public static List<PostInfo> getNews(){
+        List<PostInfo> postList = new ArrayList<PostInfo>();
+
+        postList.add(new PostInfo("Example", null, 0, null, false));
+
+        return postList;
+    }
 }
