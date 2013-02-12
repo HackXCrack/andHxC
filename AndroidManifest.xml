@@ -16,21 +16,26 @@
       android:allowBackup="true"
       android:theme="@style/ThemeCustom" >
 
-    <activity android:name="Main"
+    <activity android:name="Login"
               android:label="@string/forum_name">
+
       <intent-filter>
         <action android:name="android.intent.action.MAIN" />
         <category android:name="android.intent.category.LAUNCHER" />
       </intent-filter>
     </activity>
+
     <activity android:name="SubMain"
-        android:label="@string/forum_name">
-    </activity>
+        android:label="@string/forum_name" />
+
     <activity android:name="ForumCategory"
-              android:label="@string/forum_name">
-    </activity>
+              android:label="@string/forum_name" />
+
     <activity android:name="ForumThread"
-              android:label="@string/forum_name">
-    </activity>
+              android:label="@string/forum_name" />
+
+    <activity android:name="ForumNews"
+              android:label="@string/forum_name"/>
+
   </application>
 </manifest>
