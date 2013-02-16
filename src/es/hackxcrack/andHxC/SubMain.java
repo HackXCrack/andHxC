@@ -6,6 +6,10 @@ import android.os.Bundle;
 import android.content.Context;
 import android.content.Intent;
 
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.LayoutInflater;
@@ -105,6 +109,38 @@ public class SubMain extends Activity{
     private List<ForumInfo> defaultSubForumList;
     private HashMap<String, String> defaultSubForumNameIdMap;
     private UserManager userManager = new UserManager();
+
+
+    /**
+     * Descripción: Crea el menú a partir de submenu.xml .
+     *
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.submenu, menu);
+        return true;
+    }
+
+
+    /**
+     * Descripción: Maneja la acción de seleccionar un item del menú.
+     *
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+        case R.id.goto_news_menu_item:
+            Intent i = new Intent();
+            i.setClass(this, ForumNews.class);
+            startActivity(i);
+            return true;
+        default:
+            return super.onOptionsItemSelected(item);
+        }
+    }
+
 
     /**
      * Descripción: Muestra la lista de subforos tomandola de this.defaultSubForumList.
