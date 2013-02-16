@@ -118,7 +118,7 @@ public class SubMain extends Activity{
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.submenu, menu);
+        inflater.inflate(R.menu.submain, menu);
         return true;
     }
 
