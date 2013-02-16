@@ -9,6 +9,11 @@ import android.content.Intent;
 
 import android.graphics.Typeface;
 
+
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.LayoutInflater;
@@ -122,6 +127,37 @@ public class ForumNews extends Activity{
 
 
     private List<PostInfo> postList;
+
+
+    /**
+     * Descripción: Crea el menú a partir de submenu.xml .
+     *
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.news, menu);
+        return true;
+    }
+
+
+    /**
+     * Descripción: Maneja la acción de seleccionar un item del menú.
+     *
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+        case R.id.goto_main_menu_item:
+            Intent i = new Intent();
+            i.setClass(this, SubMain.class);
+            startActivity(i);
+            return true;
+        default:
+            return super.onOptionsItemSelected(item);
+        }
+    }
 
 
     /**
