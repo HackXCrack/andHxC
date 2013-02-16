@@ -19,4 +19,6 @@
     <string name="no_threads">sin hilos</string>
     <string name="one_thread">1 hilo</string>
     <string name="threads">hilos</string>
+    <string name="view_news">Ver noticias</string>
+    <string name="view_main_forum">Ver foro principal</string>
 </resources>
