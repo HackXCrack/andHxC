@@ -317,7 +317,7 @@ public class ForumManager {
      */
     public static List<MessageInfo> getItemsFromThread(int threadId, int page){
         List<MessageInfo> msgList = new ArrayList<MessageInfo>();
-        String url = MAIN_FORUM + "topic=" + threadId;
+        String url = MAIN_FORUM + "topic=" + threadId + "." + page * 10;
 
         String data;
         try {
