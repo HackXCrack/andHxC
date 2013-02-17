@@ -63,7 +63,7 @@ public class ForumThread extends Activity{
 
         @Override
         public int getCount(){
-            return this.messages.size() + 1;
+            return messages.size() + ((messages.size() >= ((lastPageRendered + 1) * 10))? 1: 0);
         }
 
         @Override

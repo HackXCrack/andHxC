@@ -64,7 +64,7 @@ public class ForumCategory extends Activity{
 
         @Override
         public int getCount(){
-            return this.items.size() + 1;
+            return items.size() + ((items.size() >= ((lastPageRendered + 1) * 25))? 1: 0);
         }
 
         @Override
