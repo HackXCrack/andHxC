@@ -237,7 +237,8 @@ public class ForumManager {
      * @return  List<PostInfo>
      */
     public static List<PostInfo> getItemsFromCategory(int categoryId, int page){
-        String url = MAIN_FORUM + "board=" + categoryId + "." + page * 10;
+        String url = MAIN_FORUM + "board=" + categoryId + "." + page * 25;
+        Log.d("andHxC", url);
 
         List <PostInfo> postList = new ArrayList<PostInfo>();
         String data;
@@ -252,7 +253,9 @@ public class ForumManager {
         TagNode doc = cleaner.clean(data);
 
         // Búsqueda de subforos
-        getSubforumsFromCategory(doc, postList);
+        if (page == 0){
+            getSubforumsFromCategory(doc, postList);
+        }
 
 
         // Búsqueda de hilos
@@ -314,7 +317,7 @@ public class ForumManager {
      */
     public static List<MessageInfo> getItemsFromThread(int threadId, int page){
         List<MessageInfo> msgList = new ArrayList<MessageInfo>();
-        String url = MAIN_FORUM + "topic=" + threadId;
+        String url = MAIN_FORUM + "topic=" + threadId + "." + page * 10;
 
         String data;
         try {

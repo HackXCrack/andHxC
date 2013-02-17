@@ -44,25 +44,60 @@ public class ForumCategory extends Activity{
      */
     private class PostListAdapter extends ArrayAdapter<PostInfo> {
         private List<PostInfo> items;
+        private boolean loading;
 
         public PostListAdapter(Context context, int textViewResourceId, List<PostInfo> items) {
             super(context, textViewResourceId, items);
             this.items = items;
+            loading = false;
+        }
+
+        public void setLoading(boolean loading){
+            this.loading = loading;
+        }
+
+
+        public boolean isLoading(){
+            return loading;
+        }
+
+
+        @Override
+        public int getCount(){
+            return items.size() + ((items.size() >= ((lastPageRendered + 1) * 25))? 1: 0);
         }
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             View v = convertView;
             if (v == null) {
-                LayoutInflater layout = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                LayoutInflater layout = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 v = layout.inflate(R.layout.category_row_layout, null);
+            }
+            TextView tvPostName = (TextView) v.findViewById(R.id.post_name);
+            TextView tvAuthor = (TextView) v.findViewById(R.id.post_author);
+            TextView tvResponseNum = (TextView) v.findViewById(R.id.response_num);
+
+            if (position >= items.size()){
+                if (tvPostName != null){
+                    if (loading){
+                        tvPostName.setText(getString(R.string.loading_posts));
+                    }
+                    else{
+                        tvPostName.setText(getString(R.string.load_more_posts));
+                    }
+                }
+                if (tvAuthor != null){
+                    tvAuthor.setText("");
+                }
+                if (tvResponseNum != null){
+                    tvResponseNum.setText("");
+                }
+                return v;
             }
 
             final PostInfo post = items.get(position);
             if (post != null) {
-                TextView tvPostName = (TextView) v.findViewById(R.id.post_name);
-                TextView tvAuthor = (TextView) v.findViewById(R.id.post_author);
-                TextView tvResponseNum = (TextView) v.findViewById(R.id.response_num);
                 if (tvPostName != null) {
                     tvPostName.setText(StringEscapeUtils.unescapeHtml(post.getName()));
 
@@ -125,9 +160,10 @@ public class ForumCategory extends Activity{
     }
 
 
-
     private List<PostInfo> postList;
-
+    private int lastPageRendered;
+    private int categoryId;
+    private PostListAdapter adapter;
 
     /**
      * Descripción: Crea el menú a partir de submenu.xml .
@@ -159,29 +195,69 @@ public class ForumCategory extends Activity{
         }
     }
 
+
+    /**
+     * Descripción: Muestra la siguiente página de posts.
+     *
+     */
+    public void renderNextPage(){
+        lastPageRendered++;
+
+        adapter.setLoading(true);
+        // Carga en segundo plano los posts mientras muestra la pantalla de error
+        new AsyncTask<Void, Void, List<PostInfo>>() {
+            @Override
+            protected List<PostInfo> doInBackground(Void... params) {
+                return ForumManager.getItemsFromCategory(categoryId, lastPageRendered);
+            }
+
+            @Override
+            protected void onPostExecute(List<PostInfo> posts) {
+                postList.addAll(posts);
+
+                setContentView(R.layout.forum_category);
+
+                ListView listView = (ListView) findViewById(R.id.post_list);
+                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                            touchCallback(position);
+                        }
+                    });
+
+                showPosts();
+            }
+        }.execute();
+    }
+
+
     /**
      * Descripción: Muestra el post correspondiente cuando el
      *  usuario lo selecciona.
      *
      * @param position Posición del item seleccionado.
      */
-    public void touchCallback(int position){
-        PostInfo post = this.postList.get(position);
+    public synchronized void touchCallback(int position){
+        if (position < this.postList.size()){
+            PostInfo post = this.postList.get(position);
 
-        // Jump to subforum
-        if (post.isSubforum()){
+            // Jump to subforum
+            if (post.isSubforum()){
 
-            Intent i = new Intent();
-            i.setClass(ForumCategory.context, ForumCategory.class);
-            i.putExtra("id", post.getId());
-            i.putExtra("name", post.getName());
-            startActivity(i);
+                Intent i = new Intent();
+                i.setClass(ForumCategory.context, ForumCategory.class);
+                i.putExtra("id", post.getId());
+                i.putExtra("name", post.getName());
+                startActivity(i);
+            }
+            else {
+                Intent i = new Intent();
+                i.setClass(ForumCategory.context, ForumThread.class);
+                i.putExtra("id", post.getId());
+                startActivity(i);
+            }
         }
-        else {
-            Intent i = new Intent();
-            i.setClass(ForumCategory.context, ForumThread.class);
-            i.putExtra("id", post.getId());
-            startActivity(i);
+        else if (!adapter.isLoading()){
+            renderNextPage();
         }
     }
 
@@ -193,8 +269,7 @@ public class ForumCategory extends Activity{
     public void showPosts(){
         ListView listView = (ListView) findViewById(R.id.post_list);
 
-        PostListAdapter adapter = new PostListAdapter(
-            this, R.layout.category_row_layout, this.postList);
+        adapter = new PostListAdapter(this, R.layout.category_row_layout, this.postList);
 
         listView.setAdapter(adapter);
     }
@@ -224,13 +299,14 @@ public class ForumCategory extends Activity{
         return postList.size() != 0;
     }
 
+
     /** LLamado cuando la actividad se crea por primera vez. */
     @Override
     public void onCreate(Bundle savedInstanceState){
 
         Intent i = getIntent();
 
-        int id = i.getIntExtra("id", -1);
+        categoryId = i.getIntExtra("id", -1);
         String name = i.getStringExtra("name");
 
 
@@ -241,10 +317,10 @@ public class ForumCategory extends Activity{
         setContentView(R.layout.loading_view);
 
         // Carga en segundo plano los posts mientras muestra la pantalla de error
-        new AsyncTask<Integer, Void, Boolean>() {
+        new AsyncTask<Void, Void, Boolean>() {
             @Override
-            protected Boolean doInBackground(Integer... id) {
-                return populateFromPage(id[0], 0);
+            protected Boolean doInBackground(Void... params) {
+                return populateFromPage(categoryId, 0);
             }
 
             @Override
@@ -254,6 +330,7 @@ public class ForumCategory extends Activity{
                     finish();
                 }
 
+                lastPageRendered = 0;
                 // Mostrar la lista
                 setContentView(R.layout.forum_category);
 
@@ -266,6 +343,6 @@ public class ForumCategory extends Activity{
 
                 showPosts();
             }
-        }.execute(id);
+        }.execute();
     }
 }

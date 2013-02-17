@@ -43,10 +43,27 @@ public class ForumThread extends Activity{
      */
     private class MessageListAdapter extends ArrayAdapter<MessageInfo> {
         private List<MessageInfo> messages;
+        private boolean loading;
 
         public MessageListAdapter(Context context, int textViewResourceId, List<MessageInfo> messages) {
             super(context, textViewResourceId, messages);
             this.messages = messages;
+            loading = false;
+        }
+
+        public void setLoading(boolean loading){
+            this.loading = loading;
+        }
+
+
+        public boolean isLoading(){
+            return loading;
+        }
+
+
+        @Override
+        public int getCount(){
+            return messages.size() + ((messages.size() >= ((lastPageRendered + 1) * 10))? 1: 0);
         }
 
         @Override
@@ -56,11 +73,27 @@ public class ForumThread extends Activity{
                 LayoutInflater layout = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 v = layout.inflate(R.layout.thread_row_layout, null);
             }
+            TextView tvAuthor = (TextView) v.findViewById(R.id.message_author);
+            TextView tvText = (TextView) v.findViewById(R.id.message_text);
+
+            if (position >= messages.size()){
+                if (tvAuthor != null){
+                    tvAuthor.setText("");
+                }
+                if (tvText != null){
+                    if (loading){
+                        tvText.setText(getString(R.string.loading_messages));
+                    }
+                    else{
+                        tvText.setText(getString(R.string.load_more_messages));
+                    }
+                }
+
+                return v;
+            }
 
             final MessageInfo msg = messages.get(position);
             if (msg != null){
-                TextView tvAuthor = (TextView) v.findViewById(R.id.message_author);
-                TextView tvText = (TextView) v.findViewById(R.id.message_text);
                 if (tvAuthor != null){
                     String author = StringEscapeUtils.unescapeHtml(msg.getAuthor());
                     if (!author.equals("")){
@@ -78,6 +111,9 @@ public class ForumThread extends Activity{
 
 
     public List<MessageInfo> msgList;
+    private int lastPageRendered;
+    private int threadId;
+    private MessageListAdapter adapter;
 
     /**
      * Descripción: Crea el menú a partir de submenu.xml .
@@ -111,12 +147,52 @@ public class ForumThread extends Activity{
 
 
     /**
+     * Descripción: Muestra la siguiente página de mensajes.
+     *
+     */
+    public void renderNextPage(){
+        lastPageRendered++;
+
+        adapter.setLoading(true);
+        // Carga en segundo plano los posts mientras muestra la pantalla de error
+        new AsyncTask<Void, Void, List<MessageInfo>>() {
+            @Override
+            protected List<MessageInfo> doInBackground(Void... params) {
+                return ForumManager.getItemsFromThread(threadId, lastPageRendered);
+            }
+
+            @Override
+            protected void onPostExecute(List<MessageInfo> messages) {
+                msgList.addAll(messages);
+
+                setContentView(R.layout.forum_thread);
+
+                ListView listView = (ListView) findViewById(R.id.message_list);
+                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                            touchCallback(position);
+                        }
+                    });
+
+                showMessages();
+            }
+        }.execute();
+    }
+
+
+
+    /**
      * Descripción: Acción (por definir) cuando se actúa sobre un mensaje.
      *
      * @param position Posición del item seleccionado.
      * @TODO Definir acción a realizar.
      */
-    public void touchCallback(int position){
+    public synchronized void touchCallback(int position){
+        if (position >= msgList.size()){
+            if (!adapter.isLoading()){
+                renderNextPage();
+            }
+        }
     }
 
 
@@ -127,8 +203,7 @@ public class ForumThread extends Activity{
     public void showMessages(){
         ListView listView = (ListView) findViewById(R.id.message_list);
 
-        MessageListAdapter adapter = new MessageListAdapter(
-            this, R.layout.thread_row_layout, this.msgList);
+        adapter = new MessageListAdapter(this, R.layout.thread_row_layout, this.msgList);
 
         listView.setAdapter(adapter);
     }
@@ -165,7 +240,7 @@ public class ForumThread extends Activity{
 
         Intent i = getIntent();
 
-        int id = i.getIntExtra("id", -1);
+        threadId = i.getIntExtra("id", -1);
 
         super.onCreate(savedInstanceState);
 
@@ -173,10 +248,10 @@ public class ForumThread extends Activity{
         setContentView(R.layout.loading_view);
 
         // Carga en segundo plano los posts mientras muestra la pantalla de error
-        new AsyncTask<Integer, Void, Boolean>() {
+        new AsyncTask<Void, Void, Boolean>() {
             @Override
-                protected Boolean doInBackground(Integer... id) {
-                return populateFromPage(id[0], 0);
+                protected Boolean doInBackground(Void... params) {
+                return populateFromPage(threadId, 0);
             }
 
             @Override
@@ -186,6 +261,7 @@ public class ForumThread extends Activity{
                     finish();
                 }
 
+                lastPageRendered = 0;
                 // Mostrar la lista
                 setContentView(R.layout.forum_thread);
 
@@ -198,7 +274,7 @@ public class ForumThread extends Activity{
 
                 showMessages();
             }
-        }.execute(id);
+        }.execute();
     }
 
 }
