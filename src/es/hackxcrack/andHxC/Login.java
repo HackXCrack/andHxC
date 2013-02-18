@@ -71,13 +71,22 @@ public class Login extends Activity{
      */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        Intent i;
+
         // Handle item selection
         switch (item.getItemId()) {
         case R.id.goto_news_menu_item:
-            Intent i = new Intent();
+            i = new Intent();
             i.setClass(this, ForumNews.class);
             startActivity(i);
             return true;
+
+        case R.id.setting_menu_item:
+            i = new Intent();
+            i.setClass(this, Settings.class);
+            startActivity(i);
+            return true;
+
         default:
             return super.onOptionsItemSelected(item);
         }
