@@ -55,14 +55,13 @@ public class ForumNews extends Activity{
             View v = convertView;
             if (v == null) {
                 LayoutInflater layout = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                v = layout.inflate(R.layout.category_row_layout, null);
+                v = layout.inflate(R.layout.news_row_layout, null);
             }
 
             final PostInfo post = items.get(position);
             if (post != null) {
                 TextView tvPostName = (TextView) v.findViewById(R.id.post_name);
-                TextView tvAuthor = (TextView) v.findViewById(R.id.post_author);
-                TextView tvResponseNum = (TextView) v.findViewById(R.id.response_num);
+                TextView tvCategory = (TextView) v.findViewById(R.id.post_category);
                 if (tvPostName != null) {
                     tvPostName.setText(StringEscapeUtils.unescapeHtml(post.getName()));
 
@@ -73,51 +72,8 @@ public class ForumNews extends Activity{
                         tvPostName.setTypeface(null, Typeface.NORMAL);
                     }
                 }
-
-                String author = post.getAuthor();
-                if (tvAuthor != null){
-                    if (author != null){
-                        tvAuthor.setText(getString(R.string.posted_by) + " " + author);
-                    }
-                    else{
-                        tvAuthor.setText("");
-                    }
-                }
-
-                Integer responseNum = post.getResponseNumber();
-                if(tvResponseNum != null){
-                    if (responseNum != null){
-                        switch(responseNum){
-                        case 0:
-                            if (post.isSubforum()){
-                                tvResponseNum.setText(getString(R.string.no_threads));
-                            }
-                            else{
-                                tvResponseNum.setText(getString(R.string.no_responses));
-                            }
-                            break;
-
-                        case 1:
-                            if (post.isSubforum()){
-                                tvResponseNum.setText(getString(R.string.one_thread));
-                            }
-                            else{
-                                tvResponseNum.setText(getString(R.string.one_response));
-                            }
-                            break;
-
-                        default:
-                            if (post.isSubforum()){
-                                tvResponseNum.setText(responseNum + " " + getString(R.string.threads));
-                            }
-                            else{
-                                tvResponseNum.setText(responseNum + " " + getString(R.string.responses));
-                            }
-                        }
-                    }
-                    else{
-                        tvResponseNum.setText("");
-                    }
+                if (tvCategory != null) {
+                    tvCategory.setText(getString(R.string.in_category) + " " + StringEscapeUtils.unescapeHtml(post.getForum()));
                 }
             }
             return v;
@@ -192,10 +148,10 @@ public class ForumNews extends Activity{
      *
      */
     public void showPosts(){
-        ListView listView = (ListView) findViewById(R.id.post_list);
+        ListView listView = (ListView) findViewById(R.id.news_list);
 
         PostListAdapter adapter = new PostListAdapter(
-            this, R.layout.category_row_layout, this.postList);
+            this, R.layout.news_row_layout, this.postList);
 
         listView.setAdapter(adapter);
     }
@@ -247,9 +203,9 @@ public class ForumNews extends Activity{
                 }
 
                 // Mostrar la lista
-                setContentView(R.layout.forum_category);
+                setContentView(R.layout.forum_news);
 
-                ListView listView = (ListView) findViewById(R.id.post_list);
+                ListView listView = (ListView) findViewById(R.id.news_list);
                 listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                             touchCallback(position);

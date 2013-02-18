@@ -146,7 +146,7 @@ public class ForumManager {
                 String sResponseNum = responseNode.getText().toString().trim().split("\n")[1].trim().split(" ")[0];
                 int responseNum = Integer.parseInt(sResponseNum);
 
-                subforumList.add(new PostInfo(name, responseNum, id, null, true));
+                subforumList.add(new PostInfo(name, responseNum, id, null, null, true));
             }
         }
         catch(XPatherException xpe){
@@ -225,7 +225,7 @@ public class ForumManager {
                 TagNode responseNode = thread.getChildTags()[2];
                 int responseNum = Integer.parseInt(responseNode.getText().toString().trim().split(" ")[0]);
 
-                postList.add(new PostInfo(name, responseNum, id, author, false));
+                postList.add(new PostInfo(name, responseNum, id, author, null, false));
             }
         }
     }
@@ -399,7 +399,22 @@ public class ForumManager {
 
         int id = Integer.parseInt(match.group(1));
 
-        return new PostInfo(title, null, id, author, false);
+        // Categoría del post
+        NodeList categoryNodes = element.getElementsByTagName("category");
+        if (categoryNodes.getLength() != 1){
+            Log.e("andHxC", "Error retrieving category from post");
+            return null;
+        }
+
+        Element categoryNode = (Element) categoryNodes.item(0);
+        NodeList categoryChilds = categoryNode.getChildNodes();
+        if (linkChilds.getLength() != 1){
+            Log.e("andHxC", "Error retrieving id from post (no childs)");
+            return null;
+        }
+        String forum = categoryChilds.item(0).getNodeValue();
+
+        return new PostInfo(title, null, id, author, forum, false);
     }
 
 
