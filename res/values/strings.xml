@@ -31,4 +31,6 @@
     <string name="global_preferences">Ajustes globales</string>
     <string name="setting_theme_light">Claro</string>
     <string name="setting_theme_dark">Oscuro</string>
+    <string name="username">Usuari@</string>
+    <string name="password">Contraseña</string>
 </resources>

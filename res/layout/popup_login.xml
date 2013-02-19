@@ -3,16 +3,16 @@
     android:id="@+id/popup_login"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical" 
+    android:orientation="vertical"
     android:background="@drawable/shape_popup" >
 
     <TextView
         android:id="@+id/login_title"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" 
+        android:layout_height="wrap_content"
         android:text="Ingresar"
         android:textColor="@color/background_main"
-        android:textStyle="bold" 
+        android:textStyle="bold"
         android:textSize="20sp"
         android:layout_gravity="center" />
 
@@ -21,8 +21,8 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:text="::Escribe tu usuario"
-        android:textStyle="italic" 
+        android:hint="@string/username"
+        android:textStyle="italic"
         android:textSize="14sp">
 
         <requestFocus />
@@ -32,11 +32,11 @@
         android:id="@+id/login_editext_password"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="::Escribe tu password"
+        android:hint="@string/password"
         android:inputType="textPassword"
-        android:textStyle="italic" 
-        android:textSize="14sp" /> 
-        
+        android:textStyle="italic"
+        android:textSize="14sp" />
+
     <Button
         android:id="@+id/login_btn_ingresar"
         android:layout_width="200dp"
