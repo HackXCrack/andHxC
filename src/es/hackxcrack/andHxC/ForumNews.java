@@ -6,6 +6,7 @@ import android.os.Bundle;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 
 import android.graphics.Typeface;
 
@@ -103,13 +104,22 @@ public class ForumNews extends Activity{
      */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        Intent i;
+
         // Handle item selection
         switch (item.getItemId()) {
         case R.id.goto_main_menu_item:
-            Intent i = new Intent();
+            i = new Intent();
             i.setClass(this, SubMain.class);
             startActivity(i);
             return true;
+
+        case R.id.setting_menu_item:
+            i = new Intent();
+            i.setClass(this, Settings.class);
+            startActivity(i);
+            return true;
+
         default:
             return super.onOptionsItemSelected(item);
         }
@@ -183,6 +193,19 @@ public class ForumNews extends Activity{
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
+
+        // Seleccionar tema
+        SharedPreferences sp = getApplication().getSharedPreferences("global", 0);
+        int themeId = 0;
+        if (sp.contains("themeId")){
+            themeId = sp.getInt("themeId", 0);
+        }
+
+        if (themeId != 0){
+            setTheme(themeId);
+        }
+
+
         ForumNews.context = getApplicationContext();
 
         // Salta a la vista de carga temporalmente

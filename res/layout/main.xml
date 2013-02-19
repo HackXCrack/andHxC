@@ -1,55 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	      android:orientation="vertical"
-	      android:layout_width="fill_parent"
-	      android:layout_height="fill_parent" 
-	      android:gravity="center_horizontal" 
-	      android:background="@color/background_main">
+              android:orientation="vertical"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent"
+              android:gravity="center_horizontal" >
 
-    <ProgressBar
-        android:id="@+id/progress_login"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="162dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"  
-        android:layout_marginBottom="5dp" 
-        android:visibility="visible"/>
+  <ProgressBar
+      android:id="@+id/progress_login"
+      style="?android:attr/progressBarStyleHorizontal"
+      android:layout_width="162dp"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="10dp"
+      android:layout_marginBottom="5dp"
+      android:visibility="visible"/>
 
-    <ImageView
-        android:id="@+id/iv_logo"
-        android:layout_width="302dp"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="5dp"
-        android:contentDescription="@string/logoHxC"
-        android:src="@drawable/logo" />
-    
-    <TextView android:id="@+id/textv_subtitle_main" 
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="-15dp"
-        android:layout_marginBottom="15dp"
-        android:textColor="@color/background_title"
-        android:textSize="12sp"
-        android:text="@string/subtitle_main"/>
+  <ImageView
+      android:id="@+id/iv_logo"
+      android:layout_width="302dp"
+      android:layout_height="wrap_content"
+      android:layout_marginLeft="5dp"
+      android:contentDescription="@string/logoHxC"
+      android:src="@drawable/logo" />
+
+  <TextView android:id="@+id/textv_subtitle_main"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="-15dp"
+            android:layout_marginBottom="15dp"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:text="@string/subtitle_main" />
 
   <Button
       android:id="@+id/btn_login"
       android:layout_width="226dp"
       android:layout_height="wrap_content"
-      android:text="@string/btn_login" 
-      android:background="@drawable/shape_botones" 
-      android:textColor="@color/background_main"
-      android:textStyle="bold"/>
-  
+      android:text="@string/btn_login"
+      android:textStyle="bold" />
+
   <Button
       android:id="@+id/btn_anonimo"
       android:layout_width="226dp"
       android:layout_height="wrap_content"
       android:layout_marginTop="5dp"
-      android:background="@drawable/shape_botones"
-      android:text="@string/btn_anonimo" 
-      android:textColor="@color/background_main"
+      android:text="@string/btn_anonimo"
       android:textStyle="bold" />
-  
-</LinearLayout>
 
+</LinearLayout>

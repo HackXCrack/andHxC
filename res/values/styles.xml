@@ -1,18 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
-    
-    <style name="BackgroundTitleHeaderCustom">
-        <item name="android:background">@color/background_title</item>
-    </style>
-    <style name="StyleTitleHeaderCustom">
-        <item name="android:paddingLeft">10dp</item>
-        <item name="android:textStyle">bold</item>
-        <item name="android:textColor">@color/background_main</item>
-    </style>
-    <style name="ThemeCustom" parent="android:Theme">
-        <item name="android:windowTitleSize">40dp</item>
-        <item name="android:windowTitleBackgroundStyle">@style/BackgroundTitleHeaderCustom</item>
-        <item name="android:windowTitleStyle">@style/StyleTitleHeaderCustom</item>
-    </style>
-    
+
+  <!-- Tema claro -->
+  <style name="Claro" parent="android:Theme.Light">
+    <item name="android:background">@color/background_main</item>
+
+    <item name="android:textColor">@color/background_title</item>
+
+    <item name="android:buttonStyle">@style/ButtonStyleLight</item>
+
+    <item name="android:windowTitleSize">40dp</item>
+    <item name="android:windowTitleBackgroundStyle">@style/BackgroundTitleHeaderLight</item>
+    <item name="android:windowTitleStyle">@style/StyleTitleHeaderLight</item>
+  </style>
+
+  <style name="ButtonStyleLight">
+    <item name="android:textColor">@color/background_main</item>
+    <item name="android:background">@drawable/shape_botones</item>
+    <item name="android:gravity">center</item>
+  </style>
+
+  <style name="BackgroundTitleHeaderLight">
+    <item name="android:background">@color/background_title</item>
+  </style>
+
+  <style name="StyleTitleHeaderLight">
+    <item name="android:paddingLeft">10dp</item>
+    <item name="android:textStyle">bold</item>
+    <item name="android:textColor">@color/background_main</item>
+  </style>
+
+  <!-- Tema oscuro -->
+  <style name="Oscuro" parent="android:Theme.Black" />
 </resources>
