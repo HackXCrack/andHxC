@@ -64,8 +64,12 @@ public class ForumThread extends Activity{
 
         @Override
         public int getCount(){
-            return messages.size() + ((messages.size() >= ((lastPageRendered + 1) * 10))? 1: 0);
+            return messages.size() + (((loading) || (messages.size() >= (
+                                                         (lastPageRendered + 1) * 10)))
+                                      ? 1
+                                      : 0);
         }
+
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
@@ -164,6 +168,8 @@ public class ForumThread extends Activity{
         lastPageRendered++;
 
         adapter.setLoading(true);
+        adapter.notifyDataSetChanged();
+
         // Carga en segundo plano los posts mientras muestra la pantalla de error
         new AsyncTask<Void, Void, List<MessageInfo>>() {
             @Override
@@ -173,18 +179,16 @@ public class ForumThread extends Activity{
 
             @Override
             protected void onPostExecute(List<MessageInfo> messages) {
-                msgList.addAll(messages);
+                int pos = adapter.getCount();
+                for(MessageInfo msg: messages){
+                    adapter.add(msg);
+                }
 
-                setContentView(R.layout.forum_thread);
+                adapter.setLoading(false);
+                adapter.notifyDataSetChanged();
 
                 ListView listView = (ListView) findViewById(R.id.message_list);
-                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                            touchCallback(position);
-                        }
-                    });
-
-                showMessages();
+                listView.smoothScrollToPosition(pos);
             }
         }.execute();
     }

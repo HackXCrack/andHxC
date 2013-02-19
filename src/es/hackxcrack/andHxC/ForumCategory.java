@@ -65,7 +65,10 @@ public class ForumCategory extends Activity{
 
         @Override
         public int getCount(){
-            return items.size() + ((items.size() >= ((lastPageRendered + 1) * 25))? 1: 0);
+            return items.size() + (((loading) || (items.size() >= (
+                                                      (lastPageRendered + 1) * 25)))
+                                   ? 1
+                                   : 0);
         }
 
         @Override
@@ -214,6 +217,8 @@ public class ForumCategory extends Activity{
         lastPageRendered++;
 
         adapter.setLoading(true);
+        adapter.notifyDataSetChanged();
+
         // Carga en segundo plano los posts mientras muestra la pantalla de error
         new AsyncTask<Void, Void, List<PostInfo>>() {
             @Override
@@ -223,18 +228,16 @@ public class ForumCategory extends Activity{
 
             @Override
             protected void onPostExecute(List<PostInfo> posts) {
-                postList.addAll(posts);
+                int pos = adapter.getCount();
+                for(PostInfo post: posts){
+                    adapter.add(post);
+                }
 
-                setContentView(R.layout.forum_category);
+                adapter.setLoading(false);
+                adapter.notifyDataSetChanged();
 
                 ListView listView = (ListView) findViewById(R.id.post_list);
-                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                            touchCallback(position);
-                        }
-                    });
-
-                showPosts();
+                listView.smoothScrollToPosition(pos);
             }
         }.execute();
     }
