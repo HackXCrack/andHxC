@@ -6,6 +6,7 @@ import android.os.Bundle;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 
 import android.graphics.Typeface;
 
@@ -320,6 +321,19 @@ public class ForumCategory extends Activity{
 
 
         super.onCreate(savedInstanceState);
+
+        // Seleccionar tema
+        SharedPreferences sp = getApplication().getSharedPreferences("global", 0);
+        int themeId = 0;
+        if (sp.contains("themeId")){
+            themeId = sp.getInt("themeId", 0);
+        }
+
+        if (themeId != 0){
+            setTheme(themeId);
+        }
+
+
         ForumCategory.context = getApplicationContext();
 
         // Salta a la vista de carga temporalmente

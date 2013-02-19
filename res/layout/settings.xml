@@ -1,31 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
               android:layout_width="fill_parent"
-              android:layout_height="fill_parent"
-              android:orientation="vertical" >
+              android:layout_height="fill_parent" >
 
-  <RelativeLayout android:id="@+id/choose_theme_bar"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent" >
+  <ListView android:id="@android:id/list"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent" />
 
-    <TextView android:id="@+id/textv_choose_theme"
-              android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              android:textSize="20dip"
-              android:textStyle="bold"
-              android:text="@string/theme" />
-
-    <TextView android:id="@+id/textv_current_theme"
-              android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              android:layout_below="@id/textv_choose_theme"
-              android:layout_alignParentLeft="true" />
-
-    <ImageView android:id="@+id/iv_choose_theme"
-               android:layout_width="wrap_content"
-               android:layout_height="wrap_content"
-               android:layout_alignParentRight="true"
-               android:src="@android:drawable/ic_menu_more" />
-
-  </RelativeLayout>>
 </LinearLayout>

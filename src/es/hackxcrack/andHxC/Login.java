@@ -15,6 +15,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.ConnectivityManager;
@@ -295,6 +296,20 @@ public class Login extends Activity{
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
+
+        // Seleccionar tema
+        SharedPreferences sp = getApplication().getSharedPreferences("global", 0);
+        int themeId = 0;
+        if (sp.contains("themeId")){
+            themeId = sp.getInt("themeId", 0);
+        }
+
+        if (themeId != 0){
+            setTheme(themeId);
+        }
+
+
+
         setContentView(R.layout.main);
         me = this;
 

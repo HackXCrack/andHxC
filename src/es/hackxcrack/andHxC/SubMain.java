@@ -5,6 +5,7 @@ import android.os.Bundle;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -263,6 +264,19 @@ public class SubMain extends Activity{
         this.subForumNameIdMap = new HashMap<String, String>();
 
         super.onCreate(savedInstanceState);
+
+        // Seleccionar tema
+        SharedPreferences sp = getApplication().getSharedPreferences("global", 0);
+        int themeId = 0;
+        if (sp.contains("themeId")){
+            themeId = sp.getInt("themeId", 0);
+        }
+
+        if (themeId != 0){
+            setTheme(themeId);
+        }
+
+
         setContentView(R.layout.submain);
 
         // Declara el callback
