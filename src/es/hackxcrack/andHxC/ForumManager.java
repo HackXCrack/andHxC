@@ -303,7 +303,6 @@ public class ForumManager {
         }
 
         TagNode textNode = (TagNode) textNodes[0];
-        Log.d("andHxC", cleaner.getInnerHtml(textNode));
         Spanned text = Html.fromHtml(cleaner.getInnerHtml(textNode));
 
         return new MessageInfo(author, text);
