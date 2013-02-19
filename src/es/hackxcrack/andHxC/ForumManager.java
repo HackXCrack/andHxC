@@ -199,6 +199,7 @@ public class ForumManager {
                 int id = Integer.parseInt(match.group(1));
 
                 // Extracción de la autoría
+                String author;
                 Object[] authorLink = null;
                 try {
                     authorLink = thread.evaluateXPath("//p/a");
@@ -208,12 +209,28 @@ public class ForumManager {
                     continue;
                 }
                 if (authorLink.length != 1){
-                    Log.e("andHxC", "Parse error looking for topic author");
-                    continue;
-                }
+                    // Si no se encuentra el enlace al autor se busca de otra forma
+                    try {
+                        authorLink = thread.evaluateXPath("//p");
+                    }
+                    catch(XPatherException xpe){
+                        Log.e("andHxC", xpe.toString());
+                        continue;
+                    }
+                    if (authorLink.length != 1){
+                        Log.e("andHxC", "Parse error looking for topic author");
+                        continue;
+                    }
 
-                TagNode authorTag = (TagNode) authorLink[0];
-                String author = authorTag.getText().toString();
+                    TagNode authorTag = (TagNode) authorLink[0];
+                    author = authorTag.getText().toString();
+                    String[] authorSlices = author.split("\n");
+                    author = authorSlices[0].substring(13); // len("Iniciado por ")
+                }
+                else{
+                    TagNode authorTag = (TagNode) authorLink[0];
+                    author = authorTag.getText().toString();
+                }
 
                 // Extracción del número de respuestas
                 if (thread.getChildTags().length != 4){
