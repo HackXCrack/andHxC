@@ -23,7 +23,6 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
-
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -40,8 +39,7 @@ import android.widget.PopupWindow;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import es.hackxcrack.andHxC.R;
-import es.hackxcrack.andHxC.SubMain;
+
 
 public class Login extends Activity{
 
@@ -310,7 +308,7 @@ public class Login extends Activity{
 
 
 
-        setContentView(R.layout.main);
+        setContentView(R.layout.login);
         me = this;
 
         // Asignamos los eventos a los componentes

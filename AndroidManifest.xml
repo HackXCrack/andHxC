@@ -16,7 +16,7 @@
       android:theme="@style/Oscuro"
       android:allowBackup="true" >
 
-    <activity android:name="Login"
+    <activity android:name="Main"
               android:label="@string/forum_name">
 
       <intent-filter>
@@ -24,6 +24,9 @@
         <category android:name="android.intent.category.LAUNCHER" />
       </intent-filter>
     </activity>
+
+    <activity android:name="Login"
+              android:label="@string/forum_name" />
 
     <activity android:name="SubMain"
         android:label="@string/forum_name" />

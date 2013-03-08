@@ -9,10 +9,10 @@
               android:layout_height="wrap_content"
               android:textSize="20dip" />
 
-    <TextView android:id="@+id/post_num"
-              android:layout_width="fill_parent"
+    <TextView android:id="@+id/forum_subforums"
+              android:layout_width="wrap_content"
               android:layout_height="wrap_content"
               android:textSize="14dip"
-              android:gravity="right" />
+              android:gravity="left" />
 
 </LinearLayout>

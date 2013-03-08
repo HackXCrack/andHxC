@@ -320,8 +320,6 @@ public class ForumCategory extends Activity{
         Intent i = getIntent();
 
         categoryId = i.getIntExtra("id", -1);
-        String name = i.getStringExtra("name");
-
 
         super.onCreate(savedInstanceState);
 
