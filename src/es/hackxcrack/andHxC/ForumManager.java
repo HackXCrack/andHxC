@@ -143,7 +143,12 @@ public class ForumManager {
                 TagNode responseNode = subforum.getChildTags()[2];
 
                 // Toma la fila de respuestas, haz trim() y toma de la segunda linea la primera columna
-                String sResponseNum = responseNode.getText().toString().trim().split("\n")[1].trim().split(" ")[0];
+                String[] lines = responseNode.getText().toString().trim().split("\n");
+                if (lines.length != 2){
+                     // Probablemente sea una redirección, así que ya no se loguea
+                    continue;
+                }
+                String sResponseNum = lines[1].trim().split(" ")[0];
                 int responseNum = Integer.parseInt(sResponseNum);
 
                 subforumList.add(new PostInfo(name, responseNum, id, null, null, true));
