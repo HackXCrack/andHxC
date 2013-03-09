@@ -53,12 +53,6 @@ public class SubMain extends Activity{
             final LayoutInflater layoutInflater = (LayoutInflater)LayoutInflater.from(context);
             View v = layoutInflater.inflate(R.layout.forum_row_layout, parent, false);
 
-            // Construcción del mapa que relaciona posición con subforo
-            int id = c.getInt(0);
-            int code = c.getInt(2);
-            positionToCode.put(id, code);
-
-
             bindView(v, context, c);
             return v;
         }
@@ -66,6 +60,13 @@ public class SubMain extends Activity{
 
         @Override
         public void bindView(View v, Context context, Cursor c) {
+
+            // Construcción del mapa que relaciona posición con subforo
+            int id = c.getInt(0);
+            int code = c.getInt(2);
+            positionToCode.put(id, code);
+
+            // Construcción de la vista
             String name = c.getString(1);
             String subforums = c.getString(3);
 
@@ -150,7 +151,6 @@ public class SubMain extends Activity{
      * @param position Posición del item seleccionado.
      */
     public void touchCallback(int position){
-        Log.e("andHxC", "---> " + position);
         int id = positionToCode.get(position);
 
         Intent i = new Intent();
