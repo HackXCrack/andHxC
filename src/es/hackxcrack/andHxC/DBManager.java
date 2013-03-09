@@ -42,6 +42,7 @@ public class DBManager {
         }
     }
 
+
     /**
      * Constructor de la clase.
      *
@@ -56,11 +57,14 @@ public class DBManager {
 
     public Cursor getCategoriesCursor(){
         SQLiteDatabase db = dbOpener.getWritableDatabase();
-        return db.query(CATEGORY_TABLE, new String[]{"_id", "NAME", "CODE"},
-                        null, null, null, null, "_id", null);
+        return db.rawQuery(getCategoriesQuery, null);
     }
 
 
+    private final static String getCategoriesQuery =
+        "SELECT C._id, C.NAME, C.CODE, GROUP_CONCAT(SC.NAME)" +
+        " FROM CATEGORY C LEFT JOIN SUBCATEGORY SC on C._id = SC.CATEGORY_ID " +
+        " GROUP BY C._id;";
 
 
     // Queries para generar la base de datos
@@ -143,6 +147,42 @@ public class DBManager {
         "INSERT INTO CATEGORY (_id, NAME, CODE, SECTION_ID) VALUES (27, 'Diseño gráfico', 38, 9);",
 
         "INSERT INTO CATEGORY (_id, NAME, CODE, SECTION_ID) VALUES (28, 'Manuales y revistas', 6 , 10);",
-        "INSERT INTO CATEGORY (_id, NAME, CODE, SECTION_ID) VALUES (29, 'Videotutoriales', 7, 10);"
+        "INSERT INTO CATEGORY (_id, NAME, CODE, SECTION_ID) VALUES (29, 'Videotutoriales', 7, 10);",
+
+
+
+        // Tabla de subcategorías
+        "INSERT INTO SUBCATEGORY (NAME, CATEGORY_ID) VALUES ('Reglas', 0);",
+        "INSERT INTO SUBCATEGORY (NAME, CATEGORY_ID) VALUES ('Sugerencias', 0);",
+        "INSERT INTO SUBCATEGORY (NAME, CATEGORY_ID) VALUES ('Proyectos Hack X Crack', 0);",
+        "INSERT INTO SUBCATEGORY (NAME, CATEGORY_ID) VALUES ('Presentaciones', 0);",
+
+        "INSERT INTO SUBCATEGORY (NAME, CATEGORY_ID) VALUES ('Lockpicking', 3);",
+        "INSERT INTO SUBCATEGORY (NAME, CATEGORY_ID) VALUES ('Debates semanales', 3);",
+
+        "INSERT INTO SUBCATEGORY (NAME, CATEGORY_ID) VALUES ('Forense', 8);",
+
+        "INSERT INTO SUBCATEGORY (NAME, CATEGORY_ID) VALUES ('Tutoriales y videotutoriales reversing', 9);",
+        "INSERT INTO SUBCATEGORY (NAME, CATEGORY_ID) VALUES ('Defacing', 10);",
+
+        "INSERT INTO SUBCATEGORY (NAME, CATEGORY_ID) VALUES ('Tutoriales', 11);",
+        "INSERT INTO SUBCATEGORY (NAME, CATEGORY_ID) VALUES ('Descarga malware', 11);",
+        "INSERT INTO SUBCATEGORY (NAME, CATEGORY_ID) VALUES ('Desarrollo y estudio de malware', 11);",
+
+        "INSERT INTO SUBCATEGORY (NAME, CATEGORY_ID) VALUES ('C / C++', 17);",
+        "INSERT INTO SUBCATEGORY (NAME, CATEGORY_ID) VALUES ('Java-Android', 17);",
+        "INSERT INTO SUBCATEGORY (NAME, CATEGORY_ID) VALUES ('Visual Basic', 17);",
+        "INSERT INTO SUBCATEGORY (NAME, CATEGORY_ID) VALUES ('Ejercicios resueltos', 17);",
+
+        "INSERT INTO SUBCATEGORY (NAME, CATEGORY_ID) VALUES ('Batch / Bash', 19);",
+        "INSERT INTO SUBCATEGORY (NAME, CATEGORY_ID) VALUES ('Perl', 19);",
+        "INSERT INTO SUBCATEGORY (NAME, CATEGORY_ID) VALUES ('Python', 19);",
+
+        "INSERT INTO SUBCATEGORY (NAME, CATEGORY_ID) VALUES ('Software libre y GNU/Linux libre', 22);",
+
+        "INSERT INTO SUBCATEGORY (NAME, CATEGORY_ID) VALUES ('Soporte técnico y repareción', 25);",
+        "INSERT INTO SUBCATEGORY (NAME, CATEGORY_ID) VALUES ('Modding y overclocking', 25);",
+
+        "INSERT INTO SUBCATEGORY (NAME, CATEGORY_ID) VALUES ('Room Gammer [Friki]', 27);",
     };
 }

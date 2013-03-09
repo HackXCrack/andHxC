@@ -67,10 +67,16 @@ public class SubMain extends Activity{
         @Override
         public void bindView(View v, Context context, Cursor c) {
             String name = c.getString(1);
+            String subforums = c.getString(3);
 
             TextView tvName = (TextView) v.findViewById(R.id.forum_name);
             if (tvName != null) {
                 tvName.setText(name);
+            }
+
+            TextView tvSubforums = (TextView) v.findViewById(R.id.forum_subforums);
+            if (tvSubforums != null) {
+                tvSubforums.setText(subforums);
             }
         }
     }
@@ -144,6 +150,7 @@ public class SubMain extends Activity{
      * @param position Posición del item seleccionado.
      */
     public void touchCallback(int position){
+        Log.e("andHxC", "---> " + position);
         int id = positionToCode.get(position);
 
         Intent i = new Intent();
