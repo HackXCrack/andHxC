@@ -12,6 +12,18 @@ import android.content.SharedPreferences;
  *
  */
 public class Main extends Activity{
+
+    /**
+     * LLamado cuando se reactiva el Activity.
+     * Suponemos que se ha dado hacia atrás desde la entrada principal, así que salimos.
+     *
+     */
+    protected void onResume(){
+        super.onResume();
+        finish();
+    }
+
+
     /**
      * LLamado cuando la actividad se crea por primera vez.
      * Pasa al siguiente Activity.
