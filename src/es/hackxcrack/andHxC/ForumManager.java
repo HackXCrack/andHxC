@@ -19,6 +19,7 @@ import org.htmlcleaner.*;
 import android.util.Log;
 import android.text.Html;
 import android.text.Spanned;
+import android.text.Editable;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -28,11 +29,51 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import org.xml.sax.Attributes;
+import org.xml.sax.XMLReader;
 import org.xml.sax.SAXException;
 
 public class ForumManager {
 
     private final static String MAIN_FORUM = "http://www.hackxcrack.es/forum/?";
+
+    /**
+     * Maneja los tags de imágenes reemplazandolos por el title o el alt (en este orden).
+     *
+     */
+    private static Html.TagHandler customTagHandler = new Html.TagHandler() {
+            private void handleImg(XMLReader xmlReader, Editable output) {
+                // Elimina
+                output.delete(output.length() - 1, output.length());
+                String alt = "";
+                String title = "";
+                try{
+                    alt = xmlReader.getProperty("alt").toString();
+                } catch(SAXException saxe) {}
+                try{
+                    title = xmlReader.getProperty("title").toString();
+                } catch(SAXException saxe) {}
+
+                if (!title.equals("")){
+                    output.append(" "+ title +" ");
+                }
+                else if (!alt.equals("")){
+                    output.append(" "+ alt +" ");
+                }
+
+            }
+
+
+            @Override
+            public void handleTag(boolean opening, String tag,
+                                  Editable output, XMLReader xmlReader) {
+
+                if (tag.equalsIgnoreCase("img")) {
+                    handleImg(xmlReader, output);
+                }
+            }
+        };
 
     /**
      * Esto busca en la página principal y saca los foros y las ID.
@@ -325,7 +366,7 @@ public class ForumManager {
         }
 
         TagNode textNode = (TagNode) textNodes[0];
-        Spanned text = Html.fromHtml(cleaner.getInnerHtml(textNode));
+        Spanned text = Html.fromHtml(cleaner.getInnerHtml(textNode), null, customTagHandler);
 
         return new MessageInfo(author, text);
     }
