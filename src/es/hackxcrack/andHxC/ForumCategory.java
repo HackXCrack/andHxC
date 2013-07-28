@@ -235,9 +235,6 @@ public class ForumCategory extends Activity{
 
                 adapter.setLoading(false);
                 adapter.notifyDataSetChanged();
-
-                ListView listView = (ListView) findViewById(R.id.post_list);
-                listView.smoothScrollToPosition(pos);
             }
         }.execute();
     }

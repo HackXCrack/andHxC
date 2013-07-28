@@ -186,9 +186,6 @@ public class ForumThread extends Activity{
 
                 adapter.setLoading(false);
                 adapter.notifyDataSetChanged();
-
-                ListView listView = (ListView) findViewById(R.id.message_list);
-                listView.smoothScrollToPosition(pos);
             }
         }.execute();
     }
