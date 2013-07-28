@@ -47,7 +47,6 @@ public class Login extends Activity{
     private PopupWindow popupLogin = null;
 
     private Activity me = null;
-    private UserManager loginUser = null;
 
     private Point puntoPopups = null;
 
@@ -263,7 +262,7 @@ public class Login extends Activity{
                             String tmp_User = ((EditText) v.getRootView().findViewById(R.id.login_editext_user)).getText().toString();
                             String tmp_Password = ((EditText) v.getRootView().findViewById(R.id.login_editext_password)).getText().toString();
 
-                            loginUser = new UserManager();
+                            UserManager loginUser = new ProgressBarUserManager();
                             if ( tmp_User.length() != 0 && tmp_Password.length() != 0 ){
                                 loginUser.execute(tmp_User, tmp_Password);
                                 popupLogin.dismiss();
@@ -342,22 +341,9 @@ public class Login extends Activity{
     /**
      * Descripcion : Clase interna que se realiza en un hilo independiente de la UI.
      **/
+    public class ProgressBarUserManager extends UserManager{
 
-    public class UserManager extends AsyncTask<String, Void, Integer>{
-
-        /** Url del que tomar la cookie. */
-        private final static String GET_NEW_COOKIE_URL = "http://www.hackxcrack.es/forum/";
-
-        /** Url a la que se debe enviar la petición de login. */
-        private final static String LOGIN_URL =
-            "http://www.hackxcrack.es/forum/index.php?action=login2";
-
-        private boolean loggedIn = false; // El usuario está logueado
-        private String userName = null;   // Nick del usuario
-        private String cookie = null;     // Cookie de la sesión
         ProgressBar progressBar = null;
-
-        public UserManager(){}
 
         /**
          * Se ejecutará antes de doInBackground
@@ -369,164 +355,28 @@ public class Login extends Activity{
         }
 
         /**
-         * Descripcion : Es el antiguo metodo login.
-         * @param String[] args contiene los strings pasados por parametros
-         * @return si devuelte 0 el login es correcto, -1 el login es incorrecto
-         **/
+         * Se ejecutará cuando haya una actualización sobre el estado de la tarea.
+         *
+         */
         @Override
-        protected Integer doInBackground(String...args) {
-            int correctUserLogin = -1;
-            this.cookie = this.getNewCookie();
-
-            progressBar.setProgress(10);
-
-            if (this.cookie == null) {
-                return correctUserLogin;
-            }
-
-            // Se hace la petición al sistema de login
-            progressBar.setProgress(20);
-            HttpClient httpclient = new DefaultHttpClient();
-
-            try {
-                HttpPost request = new HttpPost(LOGIN_URL);
-
-                request.addHeader("Cookie", this.cookie);
-                request.addHeader("Content-type", "application/x-www-form-urlencoded");
-
-                request.setEntity(new StringEntity("user=" + args[0]
-                                                   + "&passwrd=" + args[1]
-                                                   + "&openid_identifier=&cookielength=600&hash_password="));
-
-                HttpResponse response = httpclient.execute(request);
-                progressBar.setProgress(40);
-
-                // Si responde redireccionando es que fue bien ^^
-                Header locationHeader = response.getLastHeader("location");
-                if (locationHeader != null) {
-                    correctUserLogin = 0;
-                    this.userName = args[0];
-                    progressBar.setProgress(60);
-
-                    // Y solo queda cojer las cookies
-                    Header[] cookieHeaders = response.getHeaders("set-cookie");
-                    Vector<String> cookies = new Vector<String>();
-                    this.cookie = "";
-
-                    // Y reunir los cachitos
-                    progressBar.setProgress(70);
-                    for (Header header: cookieHeaders) {
-                        String[] slices = header.getValue().split(";");
-
-                        if (slices.length > 0) {
-                            if (! cookies.contains(slices[0])) {
-                                cookies.add(slices[0]);
-                                if (this.cookie != "") {
-                                    this.cookie += ";";
-                                }
-                                this.cookie += slices[0];
-                            }
-                        }
-                    }
-                    progressBar.setProgress(90);
-                } else {
-                    this.cookie = null;
-                }
-
-                // Excepciones que se pueden dar, simplemente las ignoramos
-            } catch (UnsupportedEncodingException encodingException) {
-            } catch (IOException ioException) {
-
-            } finally {
-                // Cerramos la conexión para asegurarnos de no malgastar recursos
-                httpclient.getConnectionManager().shutdown();
-            }
-
-            progressBar.setProgress(100);
-
-            return correctUserLogin;
+        protected void onProgressUpdate(Integer... progress) {
+            progressBar.setProgress(progress[0]);
         }
+
 
         /**
          * Se ejecutará despues de doInBackground
          **/
         @Override
-        protected void onPostExecute(Integer correctUserPass){
+        protected void onPostExecute(Boolean correctUserPass){
             progressBar.setVisibility(View.GONE);
             progressBar = null;
 
-            if ( correctUserPass == 0 ){
-                showPopupInfo(me,"Bienvenido! " + this.userName);
+            if (correctUserPass){
                 touchCallback();
             }else
-                showPopupInfo(me,"Error!, Usuario o contraseña incorrectos");
+                showPopupInfo(me, "Error!, Usuario o contraseña incorrectos");
         }
-
-        /** Devuelve la cookie. */
-        public String getCookie(){
-            return this.cookie;
-        }
-
-
-        /** Muestra si está logeado. */
-        public boolean isLogged(){
-            return this.loggedIn;
-        }
-
-
-        /** Devuelve el nick del usuario. */
-        public String getUserName(){
-            return this.userName;
-        }
-
-
-        /**
-         * Descripción: Genera una nueva cookie.
-         *
-         * @return String La nueva cookie o null si no fué posible.
-         * @throws IOException
-         */
-        private String getNewCookie(){
-            String cookie = null;
-
-            HttpClient httpclient = new DefaultHttpClient();
-            try {
-                HttpGet httpget = new HttpGet(GET_NEW_COOKIE_URL);
-
-                HttpResponse response = httpclient.execute(httpget);
-                Header cookieHeader = response.getLastHeader("set-cookie");
-                if (cookieHeader != null) {
-                    String[] tmp = cookieHeader.getValue().split(";");
-                    if (tmp.length > 0){
-                        cookie = tmp[0];
-                    }
-                }
-            }catch ( IOException e ){
-                /* no hacemos nada */
-            }finally {
-                // Cerramos la conexión para asegurarnos de no malgastar recursos
-                httpclient.getConnectionManager().shutdown();
-            }
-
-            return cookie;
-        }
-
-        /**
-         * Descripción: Cierra la sesión.
-         *
-         * @return boolean Cierto si se ha cerrado satisfactoriamente la sesión.
-         * @todo Cerrar la sesión en la web.
-         *
-         */
-        public boolean logout(){
-            if (! this.loggedIn) {
-                return false;
-            }
-
-            this.loggedIn = false;
-            return true;
-        }
-
     }
 
 }
