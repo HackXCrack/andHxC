@@ -373,7 +373,6 @@ public class Login extends Activity{
             progressBar = null;
 
             if (correctUserPass){
-                showPopupInfo(me, "Bienvenido! " + this.getUserName());
                 touchCallback();
             }else
                 showPopupInfo(me, "Error!, Usuario o contraseña incorrectos");
