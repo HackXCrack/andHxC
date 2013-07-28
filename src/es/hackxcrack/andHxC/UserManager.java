@@ -7,13 +7,17 @@ import java.io.UnsupportedEncodingException;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.Header;
-import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.protocol.BasicHttpContext;
+import org.apache.http.protocol.ExecutionContext;
+import org.apache.http.protocol.HttpContext;
 
 import android.os.AsyncTask;
 import android.util.Log;
@@ -31,6 +35,9 @@ public class UserManager extends AsyncTask<String, Integer, Boolean>{
     private final static String LOGIN_URL =
         "http://www.hackxcrack.es/forum/index.php?action=login2";
 
+    /** Url a la que redirige en caso de un login correcto. */
+    private final static String SUCCESSFULL_LOGIN_URI =
+        "/forum/index.php?action=login2;sa=check;member=3";
 
 
     private boolean loggedIn = false; // El usuario está logueado
@@ -73,7 +80,7 @@ public class UserManager extends AsyncTask<String, Integer, Boolean>{
     private static String getNewCookie() throws IOException{
         String cookie = null;
 
-        HttpClient httpclient = new DefaultHttpClient();
+        DefaultHttpClient httpclient = new DefaultHttpClient();
         try {
             HttpGet httpget = new HttpGet(GET_NEW_COOKIE_URL);
 
@@ -123,6 +130,7 @@ public class UserManager extends AsyncTask<String, Integer, Boolean>{
 
         boolean correctUserPass = false;
         HttpClient httpclient = new DefaultHttpClient();
+        HttpContext localContext = new BasicHttpContext();
         try {
             HttpPost request = new HttpPost(LOGIN_URL);
 
@@ -133,12 +141,16 @@ public class UserManager extends AsyncTask<String, Integer, Boolean>{
                                                + "&passwrd=" + password
                                                + "&openid_identifier=&cookieneverexp=&hash_password="));
 
-            HttpResponse response = httpclient.execute(request);
+            HttpResponse response = httpclient.execute(request, localContext);
+            HttpUriRequest uriRequest = (HttpUriRequest)
+                localContext.getAttribute(ExecutionContext.HTTP_REQUEST);
+
             publishProgress(30);
 
+            String uri = uriRequest.getURI().toString();
+
             // Si responde redireccionando es que fue bien ^^
-            Header locationHeader = response.getLastHeader("Location");
-            if (locationHeader != null) {
+            if (uri.equals(SUCCESSFULL_LOGIN_URI)) {
                 correctUserPass = true;
                 this.userName = username;
 
