@@ -28,16 +28,12 @@ import android.util.Log;
  */
 public class UserManager extends AsyncTask<String, Integer, Boolean>{
 
-    /** Url del que tomar la cookie. */
-    private final static String GET_NEW_COOKIE_URL = "http://www.hackxcrack.es/forum/";
-
     /** Url a la que se debe enviar la petición de login. */
     private final static String LOGIN_URL =
         "http://www.hackxcrack.es/forum/index.php?action=login2";
 
     /** Url a la que redirige en caso de un login correcto. */
-    private final static String SUCCESSFULL_LOGIN_URI =
-        "/forum/index.php?action=login2;sa=check;member=3";
+    private final static String SUCCESSFULL_LOGIN_URI = "/forum/index.php";
 
 
     private boolean loggedIn = false; // El usuario está logueado
@@ -72,36 +68,6 @@ public class UserManager extends AsyncTask<String, Integer, Boolean>{
 
 
     /**
-     * Descripción: Genera una nueva cookie.
-     *
-     * @return String La nueva cookie o null si no fué posible.
-     * @throws IOException
-     */
-    private static String getNewCookie() throws IOException{
-        String cookie = null;
-
-        DefaultHttpClient httpclient = new DefaultHttpClient();
-        try {
-            HttpGet httpget = new HttpGet(GET_NEW_COOKIE_URL);
-
-            HttpResponse response = httpclient.execute(httpget);
-            Header cookieHeader = response.getLastHeader("set-cookie");
-            if (cookieHeader != null) {
-                String[] tmp = cookieHeader.getValue().split(";");
-                if (tmp.length > 0){
-                    cookie = tmp[0];
-                }
-            }
-        } finally {
-            // Cerramos la conexión para asegurarnos de no malgastar recursos
-            httpclient.getConnectionManager().shutdown();
-        }
-
-        return cookie;
-    }
-
-
-    /**
      * Descripción: Hace login con un usuario y una password concretos.
      *
      * @param username String El nombre del usuario.
@@ -111,19 +77,6 @@ public class UserManager extends AsyncTask<String, Integer, Boolean>{
      *
      */
     public boolean login(String username, String password){
-        // Se hace necesaria una cookie
-        //  ...o quizá no, no lo probé :P
-        try {
-            this.cookie = UserManager.getNewCookie();
-        } catch(IOException e) {
-            return false;
-        }
-
-
-        if (this.cookie == null) {
-            return false;
-        }
-
         publishProgress(10);
 
         // Se hace la petición al sistema de login
@@ -134,12 +87,11 @@ public class UserManager extends AsyncTask<String, Integer, Boolean>{
         try {
             HttpPost request = new HttpPost(LOGIN_URL);
 
-            request.addHeader("Cookie", this.cookie);
             request.addHeader("Content-type", "application/x-www-form-urlencoded");
 
             request.setEntity(new StringEntity("user=" + username
                                                + "&passwrd=" + password
-                                               + "&openid_identifier=&cookieneverexp=&hash_password="));
+                                               + "&openid_identifier=&cookieneverexp=on&hash_passwrd="));
 
             HttpResponse response = httpclient.execute(request, localContext);
             HttpUriRequest uriRequest = (HttpUriRequest)
@@ -162,6 +114,7 @@ public class UserManager extends AsyncTask<String, Integer, Boolean>{
                 // Y reunir los cachitos
                 publishProgress(50);
                 for (Header header: cookieHeaders) {
+                    Log.d("andHxC", "Cookies:: " + header.getValue());
                     String[] slices = header.getValue().split(";");
 
                     if (slices.length > 0) {
@@ -174,6 +127,7 @@ public class UserManager extends AsyncTask<String, Integer, Boolean>{
                         }
                     }
                 }
+                Log.d("andHxC", "--> Cookie: " + this.cookie);
                 publishProgress(80);
             } else {
                 this.cookie = null;
