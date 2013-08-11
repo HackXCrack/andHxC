@@ -373,9 +373,12 @@ public class Login extends Activity{
             progressBar = null;
 
             if (correctUserPass){
+                ForumManager.setSessionCookie(this.getCookie());
                 touchCallback();
-            }else
+            }
+            else {
                 showPopupInfo(me, "Error!, Usuario o contraseña incorrectos");
+            }
         }
     }
 

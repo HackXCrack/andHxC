@@ -33,97 +33,25 @@ import android.view.View;
 
 import android.util.Log;
 
-import org.apache.commons.lang.StringEscapeUtils;
 
-
-public class ForumThread extends Activity{
+public class Messages extends Activity{
 
     public List<MessageInfo> msgList;
-    private int lastPageRendered;
-    private int threadId;
     private MessageListAdapter adapter;
-    private final int messagesPerPage = 10;
+    private int lastPageRendered;
+    private final int messagesPerPage = 15;
 
     /**
-     * Descripción: Crea el menú a partir de submenu.xml .
+     * Descripción: Muestra la lista de mensajes.
      *
      */
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        if (ForumManager.getSessionCookie() != null){
-            inflater.inflate(R.menu.thread_logged, menu);
-        } else {
-            inflater.inflate(R.menu.thread, menu);
-        }
-        return true;
+    public void showMessages(){
+        ListView listView = (ListView) findViewById(R.id.message_list);
+
+        adapter = new MessageListAdapter(this, R.layout.message_row_layout, this.msgList, messagesPerPage);
+
+        listView.setAdapter(adapter);
     }
-
-
-    /**
-     * Descripción: Maneja la acción de seleccionar un item del menú.
-     *
-     */
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        Intent i;
-
-        // Handle item selection
-        switch (item.getItemId()) {
-        case R.id.goto_news_menu_item:
-            i = new Intent();
-            i.setClass(this, ForumNews.class);
-            startActivity(i);
-            return true;
-
-        case R.id.setting_menu_item:
-            i = new Intent();
-            i.setClass(this, Settings.class);
-            startActivity(i);
-            return true;
-
-        case R.id.private_messages_menu_item:
-            i = new Intent();
-            i.setClass(this, Messages.class);
-            startActivity(i);
-            return true;
-
-        default:
-            return super.onOptionsItemSelected(item);
-        }
-    }
-
-
-    /**
-     * Descripción: Muestra la siguiente página de mensajes.
-     *
-     */
-    public void renderNextPage(){
-        lastPageRendered++;
-
-        adapter.setLoading(true);
-        adapter.notifyDataSetChanged();
-
-        // Carga en segundo plano los posts mientras muestra la pantalla de error
-        new AsyncTask<Void, Void, List<MessageInfo>>() {
-            @Override
-            protected List<MessageInfo> doInBackground(Void... params) {
-                return ForumManager.getItemsFromThread(threadId, lastPageRendered);
-            }
-
-            @Override
-            protected void onPostExecute(List<MessageInfo> messages) {
-                int pos = adapter.getCount();
-                for(MessageInfo msg: messages){
-                    adapter.add(msg);
-                }
-
-                adapter.setLoading(false);
-                adapter.notifyDataSetChanged();
-            }
-        }.execute();
-    }
-
 
 
     /**
@@ -142,29 +70,46 @@ public class ForumThread extends Activity{
 
 
     /**
-     * Descripción: Muestra la lista de mensajes.
+     * Descripción: Muestra la siguiente página de mensajes.
      *
      */
-    public void showMessages(){
-        ListView listView = (ListView) findViewById(R.id.message_list);
+    public void renderNextPage(){
+        lastPageRendered++;
 
-        adapter = new MessageListAdapter(this, R.layout.thread_row_layout, this.msgList, messagesPerPage);
+        adapter.setLoading(true);
+        adapter.notifyDataSetChanged();
 
-        listView.setAdapter(adapter);
+        // Carga en segundo plano los posts mientras muestra la pantalla de error
+        new AsyncTask<Void, Void, List<MessageInfo>>() {
+            @Override
+            protected List<MessageInfo> doInBackground(Void... params) {
+                return ForumManager.getPrivateMessages(lastPageRendered);
+            }
+
+            @Override
+            protected void onPostExecute(List<MessageInfo> messages) {
+                int pos = adapter.getCount();
+                for(MessageInfo msg: messages){
+                    adapter.add(msg);
+                }
+
+                adapter.setLoading(false);
+                adapter.notifyDataSetChanged();
+            }
+        }.execute();
     }
 
 
     /**
      * Descripción: Prepara todas las estructuras para mostrar la página `page`
-     *  del hilo con el id seleccionado.
+     *  de la lista de mensajes.
      *
-     * @param threadId El ID del hilo.
      * @param page La página del hilo a mostrar (la 0 sería la primera).
      *
      * @return boolean True si la operación se ha realizado correctamente.
      */
-    private boolean populateFromPage(int threadId, int page){
-        msgList = ForumManager.getItemsFromThread(threadId, page);
+    private boolean populateFromPage(int page){
+        msgList = ForumManager.getPrivateMessages(page);
         if (msgList == null){
             Context context = getApplicationContext();
             CharSequence text = "Error requesting messages";
@@ -178,15 +123,9 @@ public class ForumThread extends Activity{
         return msgList.size() != 0;
     }
 
-
     /** LLamado cuando la actividad se crea por primera vez. */
     @Override
     public void onCreate(Bundle savedInstanceState){
-
-        Intent i = getIntent();
-
-        threadId = i.getIntExtra("id", -1);
-
         super.onCreate(savedInstanceState);
 
         // Seleccionar tema
@@ -201,19 +140,20 @@ public class ForumThread extends Activity{
         }
 
 
+        // Messages.context = getApplicationContext();
 
         // Salta a la vista de carga temporalmente
         setContentView(R.layout.loading_view);
 
-        // Carga en segundo plano los posts mientras muestra la pantalla de error
+        // Carga en segundo plano los posts mientras muestra la pantalla de carga
         new AsyncTask<Void, Void, Boolean>() {
             @Override
-                protected Boolean doInBackground(Void... params) {
-                return populateFromPage(threadId, 0);
+            protected Boolean doInBackground(Void... params) {
+                return populateFromPage(0);
             }
 
             @Override
-                protected void onPostExecute(Boolean populated) {
+            protected void onPostExecute(Boolean populated) {
                 // Si falló al tomar la lista de elementos
                 if (!populated){
                     finish();
@@ -221,7 +161,7 @@ public class ForumThread extends Activity{
 
                 lastPageRendered = 0;
                 // Mostrar la lista
-                setContentView(R.layout.forum_thread);
+                setContentView(R.layout.messages);
 
                 ListView listView = (ListView) findViewById(R.id.message_list);
                 listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -234,5 +174,4 @@ public class ForumThread extends Activity{
             }
         }.execute();
     }
-
 }

@@ -34,4 +34,5 @@
     <string name="setting_theme_dark">Oscuro</string>
     <string name="username">Usuari@</string>
     <string name="password">Contraseña</string>
+    <string name="messages">Mensajes</string>
 </resources>

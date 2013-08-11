@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/goto_news_menu_item"
+          android:icon="@drawable/ic_news"
+          android:title="@string/view_news" />
+
+    <item android:id="@+id/setting_menu_item"
+          android:icon="@android:drawable/ic_menu_preferences"
+          android:title="@string/settings" />
+
+    <item android:id="@+id/private_messages_menu_item"
+          android:icon="@android:drawable/sym_action_email"
+          android:title="@string/messages" />
+</menu>

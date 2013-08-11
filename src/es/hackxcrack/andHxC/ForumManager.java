@@ -36,6 +36,8 @@ import org.xml.sax.SAXException;
 
 public class ForumManager {
 
+    private static String sessionCookie = null;
+
     private final static String MAIN_FORUM = "http://www.hackxcrack.es/forum/?";
 
     /**
@@ -98,24 +100,48 @@ public class ForumManager {
         "(?:\\?|&)topic=(\\d+)(\\.\\d+)?");
 
 
+
+    /**
+     * Descripción: Marca una cookie para usar en la sesión.
+     *  En caso de ser `null' no se utilizará.
+     *
+     * @param cookie String Valor de la cookie a usar.
+     *
+     */
+    public static void setSessionCookie(String cookie){
+        Log.d("andHxC", "SessionCookie: " + sessionCookie + " -> " + cookie);
+        sessionCookie = cookie;
+    }
+
+
+    /**
+     * Descripción: Devuelve la cookie marcada como la de la sesión.
+     *  Se considerará borrada en caso de ser `null'.
+     *
+     * @return La cookie de sesión.
+     */
+    public static String getSessionCookie(){
+        return sessionCookie;
+    }
+
+
     /**
      * Descripción: Lee los datos en una url. Usa una cookie si se especifica.
      *
      * @param url String La dirección de donde leer los datos.
-     * @param cookie String La cookie que usar al acceder a la dirección.
      *
      * @return String Los datos que devuelve la URL.
      * @throws IOException
      *
      */
-    public static String fetchUrl(String url, String cookie) throws IOException{
+    public static String fetchUrl(String url) throws IOException{
         String result = null;
 
         HttpClient httpclient = new DefaultHttpClient();
         try {
             HttpGet request = new HttpGet(url);
-            if (cookie != null){
-                request.addHeader("Cookie", cookie);
+            if (sessionCookie != null){
+                request.addHeader("Cookie", sessionCookie);
             }
 
             ResponseHandler<String> responseHandler = new BasicResponseHandler();
@@ -140,7 +166,7 @@ public class ForumManager {
     public static List<PostInfo> getForumList(){
 
         try {
-            System.out.println(fetchUrl(MAIN_FORUM, null));
+            System.out.println(fetchUrl(MAIN_FORUM));
         } catch (IOException ioException) {}
 
         return null;
@@ -306,7 +332,7 @@ public class ForumManager {
         List <PostInfo> postList = new ArrayList<PostInfo>();
         String data;
         try {
-            data = fetchUrl(url, null);
+            data = fetchUrl(url);
         } catch (IOException ioException) {
             Log.e("andHxC getPostsFromCategory", ioException.toString());
             return null;
@@ -383,7 +409,7 @@ public class ForumManager {
 
         String data;
         try {
-            data = fetchUrl(url, null);
+            data = fetchUrl(url);
         } catch (IOException ioException) {
             Log.e("andHxC getItemsFromThread", ioException.toString());
             return null;
@@ -405,6 +431,50 @@ public class ForumManager {
                 MessageInfo message = getMessageFromNode(cleaner, messageNode);
                 if (message != null){
                     msgList.add(message);
+                }
+            }
+        }
+
+        return msgList;
+    }
+
+
+    /**
+     * Descripción: Devuelve la lista de mensajes privados.
+     *
+     * @return  List<MessageInfo>
+     */
+    public static List<MessageInfo> getPrivateMessages(int page){
+        List<MessageInfo> msgList = new ArrayList<MessageInfo>();
+        String url = MAIN_FORUM + "action=pm;f=inbox;sort=date;desc;start=" + (page * 15);
+
+        String data;
+
+        try {
+            data = fetchUrl(url);
+        } catch (IOException ioException) {
+            Log.e("andHxC getPrivateMessages", ioException.toString());
+            return null;
+        }
+        HtmlCleaner cleaner = new HtmlCleaner();
+        TagNode doc = cleaner.clean(data);
+
+        Object[] messages = null;
+        try{
+            messages = doc.evaluateXPath("//div[@id=\"personal_messages\"]/form[@name=\"pmFolder\"]/div");
+        }
+        catch(XPatherException xpe){
+            Log.e("andHxC", xpe.toString());
+        }
+        if (messages != null){
+            for(int i = 0; i < messages.length; i++){
+                TagNode messageNode = (TagNode) messages[i];
+
+                if (messageNode.getAttributes().get("class").endsWith(" clear")){
+                    MessageInfo message = getMessageFromNode(cleaner, messageNode);
+                    if (message != null){
+                        msgList.add(message);
+                    }
                 }
             }
         }

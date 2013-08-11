@@ -43,5 +43,8 @@
     <activity android:name="Settings"
               android:label="@string/forum_name"/>
 
+    <activity android:name="Messages"
+              android:label="@string/forum_name"/>
+
   </application>
 </manifest>

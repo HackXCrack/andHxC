@@ -176,7 +176,11 @@ public class ForumCategory extends Activity{
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.category, menu);
+        if (ForumManager.getSessionCookie() != null){
+            inflater.inflate(R.menu.category_logged, menu);
+        } else {
+            inflater.inflate(R.menu.category, menu);
+        }
         return true;
     }
 
@@ -200,6 +204,12 @@ public class ForumCategory extends Activity{
         case R.id.setting_menu_item:
             i = new Intent();
             i.setClass(this, Settings.class);
+            startActivity(i);
+            return true;
+
+        case R.id.private_messages_menu_item:
+            i = new Intent();
+            i.setClass(this, Messages.class);
             startActivity(i);
             return true;
 

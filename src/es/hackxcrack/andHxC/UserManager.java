@@ -42,7 +42,7 @@ public class UserManager extends AsyncTask<String, Integer, Boolean>{
 
     private boolean loggedIn = false; // El usuario está logueado
     private String userName = null;   // Nick del usuario
-    private String cookie = null;     // Cookie de la sesión
+    private static String sessionCookie = null;     // Cookie de la sesión
 
 
     public UserManager(){}
@@ -55,7 +55,7 @@ public class UserManager extends AsyncTask<String, Integer, Boolean>{
 
     /** Devuelve la cookie. */
     public String getCookie(){
-        return this.cookie;
+        return sessionCookie;
     }
 
 
@@ -127,11 +127,10 @@ public class UserManager extends AsyncTask<String, Integer, Boolean>{
                     }
                     cookieString += cookie.getName() + "=" + cookie.getValue();
                 }
-
-                this.cookie = cookieString;
+                this.sessionCookie = cookieString;
                 publishProgress(80);
             } else {
-                this.cookie = null;
+                this.sessionCookie = null;
             }
 
             // Excepciones que se pueden dar, simplemente las ignoramos
@@ -143,7 +142,7 @@ public class UserManager extends AsyncTask<String, Integer, Boolean>{
         }
 
         publishProgress(100);
-        return correctUserPass;
+        return correctUserPass && (!this.sessionCookie.equals(""));
     }
 
 
