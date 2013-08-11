@@ -1,5 +1,6 @@
 package es.hackxcrack.andHxC;
 
+import java.util.List;
 import java.util.Vector;
 
 import java.io.IOException;
@@ -7,6 +8,9 @@ import java.io.UnsupportedEncodingException;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.Header;
+import org.apache.http.cookie.Cookie;
+import org.apache.http.impl.client.BasicCookieStore;
+import org.apache.http.client.CookieStore;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -82,8 +86,10 @@ public class UserManager extends AsyncTask<String, Integer, Boolean>{
         // Se hace la petición al sistema de login
 
         boolean correctUserPass = false;
-        HttpClient httpclient = new DefaultHttpClient();
+        DefaultHttpClient httpclient = new DefaultHttpClient();
         HttpContext localContext = new BasicHttpContext();
+        CookieStore cookieStore = new BasicCookieStore();
+        httpclient.setCookieStore(cookieStore);
         try {
             HttpPost request = new HttpPost(LOGIN_URL);
 
@@ -106,28 +112,23 @@ public class UserManager extends AsyncTask<String, Integer, Boolean>{
                 correctUserPass = true;
                 this.userName = username;
 
-                // Y solo queda cojer las cookies
-                Header[] cookieHeaders = response.getHeaders("set-cookie");
-                Vector<String> cookies = new Vector<String>();
-                this.cookie = "";
-
-                // Y reunir los cachitos
+                // Y solo queda cojer las cookies y reunir los cachitos
                 publishProgress(50);
-                for (Header header: cookieHeaders) {
-                    Log.d("andHxC", "Cookies:: " + header.getValue());
-                    String[] slices = header.getValue().split(";");
 
-                    if (slices.length > 0) {
-                        if (! cookies.contains(slices[0])) {
-                            cookies.add(slices[0]);
-                            if (this.cookie != "") {
-                                this.cookie += ";";
-                            }
-                            this.cookie += slices[0];
-                        }
+                String cookieString = null;
+                List<Cookie> cookies = cookieStore.getCookies();
+                for (Cookie cookie: cookies){
+
+                    // Hay que intercalar ';' entre las cookies
+                    if (cookieString == null){
+                        cookieString = "";
+                    } else {
+                        cookieString += ";";
                     }
+                    cookieString += cookie.getName() + "=" + cookie.getValue();
                 }
-                Log.d("andHxC", "--> Cookie: " + this.cookie);
+
+                this.cookie = cookieString;
                 publishProgress(80);
             } else {
                 this.cookie = null;
