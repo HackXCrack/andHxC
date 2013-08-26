@@ -38,7 +38,7 @@ public class ForumManager {
 
     private static String sessionCookie = null;
 
-    private final static String MAIN_FORUM = "http://www.hackxcrack.es/forum/?";
+    private final static String MAIN_FORUM = "http://www.hackxcrack.es/forum/?theme=6&";
 
     /**
      * Maneja los tags de imágenes reemplazandolos por el title o el alt (en este orden).
